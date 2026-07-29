@@ -1,0 +1,10 @@
+/target
+**/target
+
+# IDE / editor files
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
