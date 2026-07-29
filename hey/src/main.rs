@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::io::{self, Write};
 use std::process::ExitCode;
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
 
 const API_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
 const DEFAULT_MODEL: &str = "openai/gpt-4o-mini";
@@ -71,11 +74,75 @@ fn run() -> Result<(), String> {
         ],
     };
 
+    let answer = fetch_answer_with_spinner(api_key, request_body)?;
+
+    println!("{answer}");
+
+    Ok(())
+}
+
+/// Hides the terminal cursor on creation and restores it when dropped,
+/// so the cursor is always shown again even if we return early.
+struct CursorGuard;
+
+impl CursorGuard {
+    fn new() -> Self {
+        print!("\x1b[?25l");
+        let _ = io::stdout().flush();
+        CursorGuard
+    }
+}
+
+impl Drop for CursorGuard {
+    fn drop(&mut self) {
+        print!("\x1b[?25h");
+        let _ = io::stdout().flush();
+    }
+}
+
+fn fetch_answer_with_spinner(api_key: String, request_body: ChatRequest) -> Result<String, String> {
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let result = send_chat_request(&api_key, &request_body);
+        // Ignore send errors: if the receiver is gone there's nothing to do.
+        let _ = tx.send(result);
+    });
+
+    let _cursor_guard = CursorGuard::new();
+
+    let dot_counts = [1usize, 2, 3];
+    let mut frame = 0;
+
+    let result = loop {
+        match rx.try_recv() {
+            Ok(result) => break result,
+            Err(mpsc::TryRecvError::Disconnected) => {
+                break Err("Background request thread ended unexpectedly.".to_string());
+            }
+            Err(mpsc::TryRecvError::Empty) => {
+                let dots = ".".repeat(dot_counts[frame % dot_counts.len()]);
+                print!("\x1b[2K\rThinking{dots}");
+                let _ = io::stdout().flush();
+                frame += 1;
+                thread::sleep(Duration::from_millis(400));
+            }
+        }
+    };
+
+    // Clear the "Thinking..." line before printing the final answer/error.
+    print!("\x1b[2K\r");
+    let _ = io::stdout().flush();
+
+    result
+}
+
+fn send_chat_request(api_key: &str, request_body: &ChatRequest) -> Result<String, String> {
     let client = reqwest::blocking::Client::new();
     let response = client
         .post(API_URL)
         .bearer_auth(api_key)
-        .json(&request_body)
+        .json(request_body)
         .send()
         .map_err(|e| format!("Failed to reach OpenRouter API: {e}"))?;
 
@@ -91,15 +158,11 @@ fn run() -> Result<(), String> {
         .json()
         .map_err(|e| format!("Failed to parse OpenRouter API response: {e}"))?;
 
-    let answer = chat_response
+    chat_response
         .choices
         .first()
         .map(|choice| choice.message.content.trim().to_string())
-        .ok_or_else(|| "OpenRouter API response contained no answer.".to_string())?;
-
-    println!("{answer}");
-
-    Ok(())
+        .ok_or_else(|| "OpenRouter API response contained no answer.".to_string())
 }
 
 fn main() -> ExitCode {
