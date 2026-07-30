@@ -66,6 +66,18 @@ cp target/release/hey ~/.local/bin/hey
 - Internet connection
 - An OpenRouter API key
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`):
+
+- **MAJOR** — breaking changes to CLI behavior (e.g. invocation, output format, env vars)
+- **MINOR** — new backward-compatible features (e.g. new flags, new providers)
+- **PATCH** — bug fixes and other changes with no user-facing behavior change
+
+While the version is `0.y.z` (pre-1.0), `y` is bumped for potentially breaking changes and `z` for fixes, per common SemVer convention for early-stage projects.
+
+The `version` field in `hey/Cargo.toml` is the single source of truth. Releases are tagged in git as `vX.Y.Z`. Run `hey --version` (or `hey -V`) to check the version of your installed binary. See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.

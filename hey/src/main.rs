@@ -173,6 +173,14 @@ fn send_chat_request(api_key: &str, request_body: &ChatRequest) -> Result<String
 }
 
 fn main() -> ExitCode {
+    let mut args = std::env::args().skip(1);
+    if let Some(arg) = args.next() {
+        if arg == "--version" || arg == "-V" {
+            println!("hey version {}", env!("CARGO_PKG_VERSION"));
+            return ExitCode::SUCCESS;
+        }
+    }
+
     match run() {
         Ok(()) => ExitCode::SUCCESS,
         Err(err) => {
