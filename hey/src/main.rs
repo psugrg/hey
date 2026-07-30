@@ -8,6 +8,11 @@ use std::time::Duration;
 const API_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
 const DEFAULT_MODEL: &str = "openai/gpt-4o-mini";
 const SYSTEM_PROMPT: &str = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage.";
+const PROMPT_WIDTH: usize = 60;
+
+fn print_divider() {
+    println!("{}", "─".repeat(PROMPT_WIDTH));
+}
 
 #[derive(Serialize)]
 struct ChatMessage {
@@ -45,6 +50,7 @@ fn run() -> Result<(), String> {
 
     let model = std::env::var("OPENROUTER_MODEL").unwrap_or_else(|_| DEFAULT_MODEL.to_string());
 
+    print_divider();
     print!("> ");
     io::stdout()
         .flush()
@@ -55,6 +61,7 @@ fn run() -> Result<(), String> {
         .read_line(&mut question)
         .map_err(|e| format!("Failed to read input: {e}"))?;
     let question = question.trim();
+    print_divider();
 
     if question.is_empty() {
         return Err("No question provided.".to_string());
