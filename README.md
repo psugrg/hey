@@ -78,6 +78,8 @@ While the version is `0.y.z` (pre-1.0), `y` is bumped for potentially breaking c
 
 The `version` field in `hey/Cargo.toml` is the single source of truth. Releases are tagged in git as `vX.Y.Z`. Run `hey --version` (or `hey -V`) to check the version of your installed binary. See [CHANGELOG.md](CHANGELOG.md) for release history.
 
+The version number is bumped only when preparing the next release (not immediately after tagging), so `Cargo.toml` always reflects the last released version until a new release is being cut.
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
