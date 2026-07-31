@@ -9,6 +9,7 @@ const DEFAULT_MODEL: &str = "openai/gpt-4o-mini";
 const DEFAULT_API_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
 const DEFAULT_SYSTEM_PROMPT: &str = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage.";
 const DEFAULT_PROMPT_WIDTH: usize = 60;
+const DEFAULT_PROMPT_MARKER: &str = "> ";
 
 /// Settings needed to talk to the AI model API.
 pub struct Model {
@@ -42,6 +43,7 @@ pub struct Config {
     pub model: Model,
     pub theme: Theme,
     pub prompt_width: usize,
+    pub prompt_marker: String,
 }
 
 impl Config {
@@ -67,6 +69,7 @@ impl Config {
             },
             theme: Theme::default(),
             prompt_width: DEFAULT_PROMPT_WIDTH,
+            prompt_marker: DEFAULT_PROMPT_MARKER.to_string(),
         })
     }
 }

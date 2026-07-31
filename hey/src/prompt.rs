@@ -4,12 +4,12 @@ fn print_divider(width: usize) {
     println!("{}", "─".repeat(width));
 }
 
-/// Prints the prompt divider and `> ` marker, reads a line of input from
-/// stdin, trims it, and returns it as the user's question. Returns an error
-/// if the question is empty.
-pub fn get_question(prompt_width: usize) -> Result<String, String> {
+/// Prints the prompt divider and marker, reads a line of input from stdin,
+/// trims it, and returns it as the user's question. Returns an error if the
+/// question is empty.
+pub fn get_question(prompt_width: usize, prompt_marker: &str) -> Result<String, String> {
     print_divider(prompt_width);
-    print!("> ");
+    print!("{prompt_marker}");
     io::stdout()
         .flush()
         .map_err(|e| format!("Failed to write to stdout: {e}"))?;

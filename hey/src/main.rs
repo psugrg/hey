@@ -9,7 +9,7 @@ use std::process::ExitCode;
 fn run() -> Result<(), String> {
     let config = Config::load()?;
 
-    let question = prompt::get_question(config.prompt_width)?;
+    let question = prompt::get_question(config.prompt_width, &config.prompt_marker)?;
 
     let answer = client::fetch_answer_with_spinner(&config.model, &question)?;
 
