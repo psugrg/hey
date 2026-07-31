@@ -86,6 +86,8 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Backlog
 
-Refactor the code by making smaller modules that are easier to maintain.
-The `config` module (API key, AI model, color scheme) has been extracted already;
-next up is splitting out the OpenRouter API client and answer rendering/spinner logic.
+### Refactor the code by making smaller modules that are easier to maintain
+
+[x] Extract the `config` module (API key, AI model, color scheme)
+[x] Extract the `render` module (answer rendering)
+[x] Extract the `client` module (OpenRouter API client and spinner logic)

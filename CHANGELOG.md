@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Extracted configuration handling (API key, AI model, color scheme) into a dedicated `config` module.
+- Extracted answer rendering logic into a dedicated `render` module.
+- Extracted the OpenRouter API client and "Thinking..." spinner logic into a dedicated `client` module.
 
 ## [0.1.0] - 2026-07-30
 
