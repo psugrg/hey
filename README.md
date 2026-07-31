@@ -46,6 +46,17 @@ You can get an API key from [openrouter.ai](https://openrouter.ai).
 
 ## Installation
 
+### Download a prebuilt binary
+
+Prebuilt binaries for Linux (amd64) are published on the [GitHub Releases](../../releases) page as `hey_x.x.x_linux_amd64.tar.gz`. Download and extract the archive, then copy the `hey` binary somewhere on your `PATH`, for example:
+
+```
+tar -xzf hey_x.x.x_linux_amd64.tar.gz
+cp hey ~/.local/bin/hey
+```
+
+### Build from source
+
 Build from source using Cargo:
 
 ```
@@ -92,3 +103,7 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
    - [x] Extract the `render` module (answer rendering)
    - [x] Extract the `client` module (OpenRouter API client and spinner logic)
    - [x] Extract the `prompt` module (question input)
+
+2. Create Github actions to generate the release assets
+
+   - [x] Automatically build and publish the `linux_amd64` release asset (`hey_x.x.x_linux_amd64.tar.gz`) on tag push

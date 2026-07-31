@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Fenced code blocks in answers are now rendered with grey top/bottom borders showing the language, and the code itself in blue.
+- GitHub Actions workflow to automatically build and publish the `linux_amd64` release asset (`hey_x.x.x_linux_amd64.tar.gz`, including the binary, `LICENSE`, and `README.md`) when a version tag is pushed.
 
 ### Changed
 

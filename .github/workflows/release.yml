@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo/target
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: hey
+
+      - name: Build release binary
+        run: cargo build --release --manifest-path hey/Cargo.toml
+
+      - name: Set version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Package release asset
+        run: |
+          asset_name="hey_${{ steps.version.outputs.version }}_linux_amd64.tar.gz"
+          staging="hey_${{ steps.version.outputs.version }}_linux_amd64"
+          mkdir "$staging"
+          cp hey/target/release/hey "$staging"/
+          cp LICENSE "$staging"/
+          cp README.md "$staging"/
+          tar -czf "$asset_name" -C "$staging" hey LICENSE README.md
+          echo "ASSET_NAME=$asset_name" >> "$GITHUB_ENV"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET_NAME }}
