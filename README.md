@@ -91,3 +91,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 [x] Extract the `config` module (API key, AI model, color scheme)
 [x] Extract the `render` module (answer rendering)
 [x] Extract the `client` module (OpenRouter API client and spinner logic)
+[x] Extract the `prompt` module (question input)
