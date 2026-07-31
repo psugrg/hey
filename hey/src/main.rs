@@ -1,3 +1,6 @@
+mod config;
+
+use config::{Config, Model, Theme};
 use serde::{Deserialize, Serialize};
 use std::io::{self, Write};
 use std::process::ExitCode;
@@ -5,22 +8,14 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
-const API_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
-const DEFAULT_MODEL: &str = "openai/gpt-4o-mini";
-const SYSTEM_PROMPT: &str = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage.";
-const PROMPT_WIDTH: usize = 60;
-const GREY: &str = "\x1b[90m";
-const BLUE: &str = "\x1b[94m";
-const RESET: &str = "\x1b[0m";
-
-fn print_divider() {
-    println!("{}", "─".repeat(PROMPT_WIDTH));
+fn print_divider(width: usize) {
+    println!("{}", "─".repeat(width));
 }
 
 /// Renders an answer, styling fenced code blocks (```lang ... ```) with a
-/// grey top/bottom border (showing the language on the top border) and
-/// printing the code lines themselves in blue.
-fn render_answer(answer: &str) {
+/// top/bottom border (showing the language on the top border) and
+/// printing the code lines themselves.
+fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
     let mut in_code_block = false;
 
     for line in answer.lines() {
@@ -34,21 +29,28 @@ fn render_answer(answer: &str) {
                 } else {
                     format!(" {lang} ")
                 };
-                let dash_count = PROMPT_WIDTH.saturating_sub(label.chars().count() + 2);
+                let dash_count = prompt_width.saturating_sub(label.chars().count() + 2);
                 println!(
-                    "{GREY}──{label}{}{RESET}",
-                    "─".repeat(dash_count.max(2))
+                    "{}──{label}{}{}",
+                    theme.code_snippet_border_color,
+                    "─".repeat(dash_count.max(2)),
+                    theme.reset
                 );
                 in_code_block = true;
             } else {
-                println!("{GREY}{}{RESET}", "─".repeat(PROMPT_WIDTH));
+                println!(
+                    "{}{}{}",
+                    theme.code_snippet_border_color,
+                    "─".repeat(prompt_width),
+                    theme.reset
+                );
                 in_code_block = false;
             }
             continue;
         }
 
         if in_code_block {
-            println!("{BLUE}{line}{RESET}");
+            println!("{}{line}{}", theme.code_snippet_text_color, theme.reset);
         } else {
             println!("{line}");
         }
@@ -83,15 +85,9 @@ struct ChatResponseMessage {
 }
 
 fn run() -> Result<(), String> {
-    let api_key = std::env::var("OPENROUTER_API_KEY").map_err(|_| {
-        "OPENROUTER_API_KEY environment variable is not set.\n\
-         Set it with: export OPENROUTER_API_KEY=\"your-api-key-here\""
-            .to_string()
-    })?;
+    let config = Config::load()?;
 
-    let model = std::env::var("OPENROUTER_MODEL").unwrap_or_else(|_| DEFAULT_MODEL.to_string());
-
-    print_divider();
+    print_divider(config.prompt_width);
     print!("> ");
     io::stdout()
         .flush()
@@ -102,18 +98,18 @@ fn run() -> Result<(), String> {
         .read_line(&mut question)
         .map_err(|e| format!("Failed to read input: {e}"))?;
     let question = question.trim();
-    print_divider();
+    print_divider(config.prompt_width);
 
     if question.is_empty() {
         return Err("No question provided.".to_string());
     }
 
     let request_body = ChatRequest {
-        model,
+        model: config.model.name.clone(),
         messages: vec![
             ChatMessage {
                 role: "system",
-                content: SYSTEM_PROMPT.to_string(),
+                content: config.model.system_prompt.clone(),
             },
             ChatMessage {
                 role: "user",
@@ -122,9 +118,9 @@ fn run() -> Result<(), String> {
         ],
     };
 
-    let answer = fetch_answer_with_spinner(api_key, request_body)?;
+    let answer = fetch_answer_with_spinner(&config.model, request_body)?;
 
-    render_answer(&answer);
+    render_answer(&answer, &config.theme, config.prompt_width);
 
     Ok(())
 }
@@ -148,11 +144,14 @@ impl Drop for CursorGuard {
     }
 }
 
-fn fetch_answer_with_spinner(api_key: String, request_body: ChatRequest) -> Result<String, String> {
+fn fetch_answer_with_spinner(model: &Model, request_body: ChatRequest) -> Result<String, String> {
     let (tx, rx) = mpsc::channel();
 
+    let api_key = model.api_key.clone();
+    let api_url = model.api_url.clone();
+
     thread::spawn(move || {
-        let result = send_chat_request(&api_key, &request_body);
+        let result = send_chat_request(&api_key, &api_url, &request_body);
         // Ignore send errors: if the receiver is gone there's nothing to do.
         let _ = tx.send(result);
     });
@@ -185,10 +184,14 @@ fn fetch_answer_with_spinner(api_key: String, request_body: ChatRequest) -> Resu
     result
 }
 
-fn send_chat_request(api_key: &str, request_body: &ChatRequest) -> Result<String, String> {
+fn send_chat_request(
+    api_key: &str,
+    api_url: &str,
+    request_body: &ChatRequest,
+) -> Result<String, String> {
     let client = reqwest::blocking::Client::new();
     let response = client
-        .post(API_URL)
+        .post(api_url)
         .bearer_auth(api_key)
         .json(request_body)
         .send()

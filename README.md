@@ -83,3 +83,9 @@ The version number is bumped only when preparing the next release (not immediate
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Backlog
+
+Refactor the code by making smaller modules that are easier to maintain.
+The `config` module (API key, AI model, color scheme) has been extracted already;
+next up is splitting out the OpenRouter API client and answer rendering/spinner logic.
