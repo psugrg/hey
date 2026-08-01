@@ -144,3 +144,5 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
      The example invocation `curl -fsSL https://github.com/psugrg/hey/install.sh | sh`.
 
    - [x] Extend the installation instructions to contain the step of installing the lates version with `curl`.
+   - [x] The installation script should also check if the `OPENROUTER_API_KEY` is available and set. If not,
+         the script should guide the user where to register it and how to add it to the environment variable (and to `.bashrc` and `.zshrc`).

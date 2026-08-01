@@ -93,3 +93,12 @@ case ":${PATH}:" in
     log "and add that line to your .bashrc or .zshrc to make it permanent."
     ;;
 esac
+
+if [ -z "${OPENROUTER_API_KEY:-}" ]; then
+  log ""
+  log "Note: the OPENROUTER_API_KEY environment variable is not set."
+  log "hey needs an OpenRouter API key to work. Get one at https://openrouter.ai"
+  log "then set it with:"
+  log "  export OPENROUTER_API_KEY=\"your-api-key-here\""
+  log "and add that line to your .bashrc or .zshrc to make it permanent."
+fi
