@@ -3,37 +3,19 @@
 `hey` is a simple command-line AI assistant for your terminal - right there where you need it.
 
 ---
+
 ![Example usage of the hey application](./.github/example-usage.png)
 
 ---
+
 Install the latest release with a single command
 
- ```bash
- curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
- ```
+```bash
+curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
+```
 
 > [!NOTE]
 > `hey` requires the [OpenRouter.ai](https://openrouter.ai) API key to function!
-
-## Usage
-
-Run `hey` with no arguments:
-
-```bash
-hey
-```
-
-The tool will wait for you to type your question and press Enter. It sends the question to OpenRouter.ai, prints the answer, then exits.
-
-Example:
-
-```bash
-hey
-> how to list all files in a directory?
-You can use `ls` to list files in a directory. For example:
-  ls -la
-lists all files (including hidden ones) with detailed information.
-```
 
 ## Installation methods
 
