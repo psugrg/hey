@@ -11,7 +11,7 @@ This document describes how to cut a new release of `hey`.
 
 1. **Bump the version** in `hey/Cargo.toml` (e.g. `0.1.0` → `0.1.1`), following the versioning convention described in [README.md](README.md#versioning).
 
-2. **Update `CHANGELOG.md`**: move the `[Unreleased]` content into a new dated section (e.g. `## [0.1.1] - 2026-08-01`), and start a fresh empty `[Unreleased]` section for future work.
+2. **Update `CHANGELOG.md`**: move the `[Unreleased]` content into a new dated section (e.g. `## [0.1.1] - 2026-08-01`), and start a fresh empty `[Unreleased]` section for future work. **This step is required** — the release workflow uses this section as the GitHub Release notes (see below). If it's skipped or the heading doesn't match the tagged version exactly, the release will still be published, but with GitHub's auto-generated commit-based notes instead.
 
 3. **Commit these changes**:
 
@@ -37,7 +37,8 @@ The [`.github/workflows/release.yml`](.github/workflows/release.yml) workflow tr
 3. **Build**: `cargo build --release --manifest-path hey/Cargo.toml`.
 4. **Derive the version** from the tag name — strips the leading `v`, so `v0.1.1` → `0.1.1`.
 5. **Package**: copies the built `hey` binary, `LICENSE`, and `README.md` into a staging folder, then tars them into `hey_0.1.1_linux_amd64.tar.gz` (files sit at the archive root, no subdirectory).
-6. **Publish**: uses `softprops/action-gh-release@v2` to create a GitHub Release for that tag (if one doesn't already exist) and attach the `.tar.gz` as a release asset.
+6. **Extract release notes**: looks for a `## [0.1.1]` section in `CHANGELOG.md` and, if found, uses its content as the GitHub Release notes. If no matching section is found, the release falls back to GitHub's auto-generated notes (based on commits/PRs since the previous tag).
+7. **Publish**: uses `softprops/action-gh-release@v2` to create a GitHub Release for that tag (if one doesn't already exist), attach the `.tar.gz` as a release asset, and set the release notes as described above.
 
 ## End result
 

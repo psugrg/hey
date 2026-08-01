@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `install.sh` now checks whether `OPENROUTER_API_KEY` is set and, if not, guides the user to get a key from [openrouter.ai](https://openrouter.ai) and add it to their environment (and to `.bashrc`/`.zshrc`).
 
+### Changed
+
+- The release workflow now sources GitHub Release notes from the corresponding `CHANGELOG.md` section, falling back to auto-generated notes if no matching section is found.
+
 ## [0.2.0] - 2026-08-01
 
 ### Added

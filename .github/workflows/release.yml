@@ -41,7 +41,30 @@ jobs:
           tar -czf "$asset_name" -C "$staging" hey LICENSE README.md
           echo "ASSET_NAME=$asset_name" >> "$GITHUB_ENV"
 
-      - name: Publish GitHub Release
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          awk -v ver="## [${{ steps.version.outputs.version }}]" '
+            index($0, ver) == 1 {found=1; next}
+            found && /^## \[/ {exit}
+            found {print}
+          ' CHANGELOG.md > release_notes.md
+          if [ -s release_notes.md ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish GitHub Release (with changelog notes)
+        if: steps.changelog.outputs.found == 'true'
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.ASSET_NAME }}
+          body_path: release_notes.md
+
+      - name: Publish GitHub Release (auto-generated notes)
+        if: steps.changelog.outputs.found != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET_NAME }}
+          generate_release_notes: true
