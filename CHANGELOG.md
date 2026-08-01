@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-01
+
 ### Added
 
 - Fenced code blocks in answers are now rendered with grey top/bottom borders showing the language, and the code itself in blue.
