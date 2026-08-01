@@ -42,6 +42,9 @@ lists all files (including hidden ones) with detailed information.
 export OPENROUTER_API_KEY="your-api-key-here"
 ```
 
+> [!TIP]
+> Add this export routine to your `.bashrc` or `.zshrc` file
+
 You can get an API key from [openrouter.ai](https://openrouter.ai).
 
 ## Installation
@@ -70,6 +73,18 @@ The compiled binary will be available at `target/release/hey`. Copy it somewhere
 ```
 cp target/release/hey ~/.local/bin/hey
 ```
+
+### Make it accessible
+
+Add the `~/.local/bin` directory to your `$PATH` variable.
+
+```
+export PATH="$HOME/.local/bin:$PATH"
+
+```
+
+> [!TIP]
+> Add this export routine to your `.bashrc` or `.zshrc` file
 
 ## Requirements
 
