@@ -91,6 +91,8 @@ The `version` field in `hey/Cargo.toml` is the single source of truth. Releases 
 
 The version number is bumped only when preparing the next release (not immediately after tagging), so `Cargo.toml` always reflects the last released version until a new release is being cut.
 
+See [RELEASING.md](RELEASING.md) for the step-by-step release process.
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
