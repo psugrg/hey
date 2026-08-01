@@ -2,29 +2,33 @@
 
 `hey` is a simple command-line AI assistant for your terminal - right there where you need it.
 
+---
+![Example usage of the hey application](./.github/example-usage.png)
+
+---
+Install the latest release with a single command
+
+ ```bash
+ curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
+ ```
+
 > [!NOTE]
-> Install the latest release with a single command:
->
-> ```
-> curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
-> ```
->
-> `hey` uses the [OpenRouter.ai](https://openrouter.ai) API, so make sure you have the API key.
+> `hey` requires the [OpenRouter.ai](https://openrouter.ai) API key to function!
 
 ## Usage
 
 Run `hey` with no arguments:
 
-```
-$ hey
+```bash
+hey
 ```
 
 The tool will wait for you to type your question and press Enter. It sends the question to OpenRouter.ai, prints the answer, then exits.
 
 Example:
 
-```
-$ hey
+```bash
+hey
 > how to list all files in a directory?
 You can use `ls` to list files in a directory. For example:
   ls -la
@@ -37,7 +41,7 @@ lists all files (including hidden ones) with detailed information.
 
 Install the latest release with a single command:
 
-```
+```bash
 curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
 ```
 
@@ -50,7 +54,7 @@ This downloads the latest `linux_amd64` release and installs the `hey` binary to
 
 Prebuilt binaries for Linux (amd64) are published on the [GitHub Releases](../../releases) page as `hey_x.x.x_linux_amd64.tar.gz`. Download and extract the archive, then copy the `hey` binary somewhere on your `PATH`, for example:
 
-```
+```bash
 tar -xzf hey_x.x.x_linux_amd64.tar.gz
 cp hey ~/.local/bin/hey
 ```
@@ -59,7 +63,7 @@ cp hey ~/.local/bin/hey
 
 Build from source using Cargo:
 
-```
+```bash
 git clone <repository-url>
 cd hey/hey
 cargo build --release
@@ -67,7 +71,7 @@ cargo build --release
 
 The compiled binary will be available at `target/release/hey`. Copy it somewhere on your `PATH` to use it as the `hey` command, for example:
 
-```
+```bash
 cp target/release/hey ~/.local/bin/hey
 ```
 
@@ -75,7 +79,7 @@ cp target/release/hey ~/.local/bin/hey
 
 Add the `~/.local/bin` directory to your `$PATH` variable.
 
-```
+```bash
 export PATH="$HOME/.local/bin:$PATH"
 
 ```
@@ -87,7 +91,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 `hey` requires an OpenRouter API key, provided via the `OPENROUTER_API_KEY` environment variable:
 
-```
+```bash
 export OPENROUTER_API_KEY="your-api-key-here"
 ```
 
