@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fenced code blocks in answers are now rendered with grey top/bottom borders showing the language, and the code itself in blue.
 - GitHub Actions workflow to automatically build and publish the `linux_amd64` release asset (`hey_x.x.x_linux_amd64.tar.gz`, including the binary, `LICENSE`, and `README.md`) when a version tag is pushed.
+- `install.sh` script to download and install the latest (or a specific, via `VERSION`) `linux_amd64` release binary from GitHub, configurable via the `INSTALL_DIR` environment variable.
 
 ### Changed
 
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extracted the OpenRouter API client and "Thinking..." spinner logic into a dedicated `client` module.
 - Extracted question prompt/input handling into a dedicated `prompt` module.
 - Prompt marker (`> `) is now configurable in the `config` module.
+- README installation instructions now include a one-line `curl | sh` install step using `install.sh`.
 
 ## [0.1.0] - 2026-07-30
 

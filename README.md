@@ -49,6 +49,19 @@ You can get an API key from [openrouter.ai](https://openrouter.ai).
 
 ## Installation
 
+### Install with curl
+
+Install the latest release with a single command:
+
+```
+curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
+```
+
+This downloads the latest `linux_amd64` release and installs the `hey` binary to `~/.local/bin` (override with the `INSTALL_DIR` environment variable, and pin a specific version with `VERSION`, e.g. `VERSION=0.1.0 sh install.sh`).
+
+> [!TIP]
+> If `~/.local/bin` isn't already on your `$PATH`, the script will tell you how to add it.
+
 ### Download a prebuilt binary
 
 Prebuilt binaries for Linux (amd64) are published on the [GitHub Releases](../../releases) page as `hey_x.x.x_linux_amd64.tar.gz`. Download and extract the archive, then copy the `hey` binary somewhere on your `PATH`, for example:
@@ -124,3 +137,13 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 2. Create Github actions to generate the release assets
 
    - [x] Automatically build and publish the `linux_amd64` release asset (`hey_x.x.x_linux_amd64.tar.gz`) on tag push
+
+3. Installation script
+
+   - [x] Add the `install.sh` script that will install the latest release version from the repository.
+
+     The link to the repository `https://github.com/psugrg/hey`.
+     The example path to the asset `https://github.com/psugrg/hey/releases/download/v0.1.0/hey_0.1.0_linux_amd64.tar.gz`.
+     The example invocation `curl -fsSL https://github.com/psugrg/hey/install.sh | sh`.
+
+   - [x] Extend the installation instructions to contain the step of installing the lates version with `curl`.
