@@ -1,15 +1,15 @@
 # hey
 
-`hey` is a simple command-line AI assistant for questions about command-line tools. Ask it things like:
-
-- "how to list all files in a directory?"
-- "explain the `cat` command"
-- "how to search a text in files"
-
-and get a quick, focused answer right in your terminal.
+`hey` is a simple command-line AI assistant for your terminal - right there where you need it.
 
 > [!NOTE]
-> `hey` uses the [OpenRouter.ai](https://openrouter.ai) API.
+> Install the latest release with a single command:
+>
+> ```
+> curl -fsSL https://raw.githubusercontent.com/psugrg/hey/main/install.sh | sh
+> ```
+>
+> `hey` uses the [OpenRouter.ai](https://openrouter.ai) API, so make sure you have the API key.
 
 ## Usage
 
@@ -31,7 +31,7 @@ You can use `ls` to list files in a directory. For example:
 lists all files (including hidden ones) with detailed information.
 ```
 
-## Installation
+## Installation methods
 
 ### Install with curl
 
