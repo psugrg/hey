@@ -8,11 +8,8 @@
 
 and get a quick, focused answer right in your terminal.
 
-## Features
-
-- Natural language Q&A focused on command-line usage and tools
-- Powered by [OpenRouter.ai](https://openrouter.ai)
-- Minimal, single-question-per-session workflow — no clutter, no chat history
+> [!NOTE]
+> `hey` uses the [OpenRouter.ai](https://openrouter.ai) API.
 
 ## Usage
 
@@ -33,19 +30,6 @@ You can use `ls` to list files in a directory. For example:
   ls -la
 lists all files (including hidden ones) with detailed information.
 ```
-
-## Configuration
-
-`hey` requires an OpenRouter API key, provided via the `OPENROUTER_API_KEY` environment variable:
-
-```
-export OPENROUTER_API_KEY="your-api-key-here"
-```
-
-> [!TIP]
-> Add this export routine to your `.bashrc` or `.zshrc` file
-
-You can get an API key from [openrouter.ai](https://openrouter.ai).
 
 ## Installation
 
@@ -98,6 +82,19 @@ export PATH="$HOME/.local/bin:$PATH"
 
 > [!TIP]
 > Add this export routine to your `.bashrc` or `.zshrc` file
+
+## Configuration
+
+`hey` requires an OpenRouter API key, provided via the `OPENROUTER_API_KEY` environment variable:
+
+```
+export OPENROUTER_API_KEY="your-api-key-here"
+```
+
+> [!TIP]
+> Add this export routine to your `.bashrc` or `.zshrc` file
+
+You can get an API key from [openrouter.ai](https://openrouter.ai).
 
 ## Requirements
 
