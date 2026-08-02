@@ -98,15 +98,15 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 
 While the version is `0.y.z` (pre-1.0), `y` is bumped for potentially breaking changes and `z` for fixes, per common SemVer convention for early-stage projects.
 
-The `version` field in `hey/Cargo.toml` is the single source of truth. Releases are tagged in git as `vX.Y.Z`. Run `hey --version` (or `hey -V`) to check the version of your installed binary. See [CHANGELOG.md](CHANGELOG.md) for release history.
-
-The version number is bumped only when preparing the next release (not immediately after tagging), so `Cargo.toml` always reflects the last released version until a new release is being cut.
-
-See [RELEASING.md](RELEASING.md) for the step-by-step release process.
+Run `hey --version` (or `hey -V`) to check the version of your installed binary. See [CHANGELOG.md](CHANGELOG.md) for release history and [RELEASING.md](RELEASING.md) for the release process.
 
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Contributing
+
+See [AGENTS.md](AGENTS.md) for repo layout, build commands, and the release checklist.
 
 ## Backlog
 
@@ -136,6 +136,7 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 4. Create `AGENTS.md` file
 
    - [x] Initialize the project in `opencode` with `/init` command to create the `AGENTS.md` file. More on that [here](https://opencode.ai/docs/rules/)
+   - [x] Cleanup the `README.md` file to not to duplicate information from `AGENTS.md`
    - [ ] Add rule to modularize the application. This means that the agent should not keep everything in one file but rather create software modules.
    - [ ] Add rule to minimize commets in code. The code should be self-explanatory. Only the inrerfaces should be properly documented.
 
