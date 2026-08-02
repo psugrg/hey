@@ -132,3 +132,13 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
    - [x] Extend the installation instructions to contain the step of installing the lates version with `curl`.
    - [x] The installation script should also check if the `OPENROUTER_API_KEY` is available and set. If not,
          the script should guide the user where to register it and how to add it to the environment variable (and to `.bashrc` and `.zshrc`).
+
+4. Create `AGENTS.md` file
+
+   - [x] Initialize the project in `opencode` with `/init` command to create the `AGENTS.md` file. More on that [here](https://opencode.ai/docs/rules/)
+   - [ ] Add rule to modularize the application. This means that the agent should not keep everything in one file but rather create software modules.
+   - [ ] Add rule to minimize commets in code. The code should be self-explanatory. Only the inrerfaces should be properly documented.
+
+5. Add a new feature that allows to continue the discussion
+
+   - [ ] It should be possible to continue the discussion to add a follow-up questions. This should be possible by using the `-c` or `--continue` flag
