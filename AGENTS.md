@@ -32,3 +32,8 @@ Releases are tag-triggered (`.github/workflows/release.yml` on push of `v*` tags
 
 - Keep `CHANGELOG.md` updated under `[Unreleased]` for any user-facing change (Keep a Changelog format).
 - Versioning is semver, but pre-1.0: `y` bumps for breaking changes, `z` for fixes (see README.md#versioning).
+
+## Code style
+
+- Keep the codebase modular: prefer multiple small, focused modules (as with `config`/`client`/`prompt`/`render`) over growing `main.rs` or any single file. Give new, distinct concerns their own module rather than bolting them onto an existing one.
+- Minimize comments: code should be self-explanatory through naming and structure. Reserve doc comments (`///`, `//!`) for public interfaces and module-level docs (see `config.rs` for the expected style); avoid inline comments that just restate what the code does.

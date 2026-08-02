@@ -137,8 +137,8 @@ See [AGENTS.md](AGENTS.md) for repo layout, build commands, and the release chec
 
    - [x] Initialize the project in `opencode` with `/init` command to create the `AGENTS.md` file. More on that [here](https://opencode.ai/docs/rules/)
    - [x] Cleanup the `README.md` file to not to duplicate information from `AGENTS.md`
-   - [ ] Add rule to modularize the application. This means that the agent should not keep everything in one file but rather create software modules.
-   - [ ] Add rule to minimize commets in code. The code should be self-explanatory. Only the inrerfaces should be properly documented.
+   - [x] Add rule to modularize the application. This means that the agent should not keep everything in one file but rather create software modules.
+   - [x] Add rule to minimize commets in code. The code should be self-explanatory. Only the inrerfaces should be properly documented.
 
 5. Add a new feature that allows to continue the discussion
 
