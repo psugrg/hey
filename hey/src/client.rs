@@ -5,10 +5,35 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
-#[derive(Serialize)]
-struct ChatMessage {
-    role: &'static str,
-    content: String,
+/// A single turn in a conversation, sent to and received from the
+/// OpenRouter chat completions API, and used to persist history.
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ChatMessage {
+    pub role: String,
+    pub content: String,
+}
+
+impl ChatMessage {
+    pub fn system(content: String) -> Self {
+        ChatMessage {
+            role: "system".to_string(),
+            content,
+        }
+    }
+
+    pub fn user(content: String) -> Self {
+        ChatMessage {
+            role: "user".to_string(),
+            content,
+        }
+    }
+
+    pub fn assistant(content: String) -> Self {
+        ChatMessage {
+            role: "assistant".to_string(),
+            content,
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -51,21 +76,12 @@ impl Drop for CursorGuard {
     }
 }
 
-/// Sends `question` to the configured model, showing a spinner
+/// Sends `messages` to the configured model, showing a spinner
 /// while waiting for the response, and returns the trimmed answer text.
-pub fn fetch_answer_with_spinner(model: &Model, question: &str) -> Result<String, String> {
+pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Result<String, String> {
     let request_body = ChatRequest {
         model: model.name.clone(),
-        messages: vec![
-            ChatMessage {
-                role: "system",
-                content: model.system_prompt.clone(),
-            },
-            ChatMessage {
-                role: "user",
-                content: question.to_string(),
-            },
-        ],
+        messages: messages.to_vec(),
     };
 
     let (tx, rx) = mpsc::channel();

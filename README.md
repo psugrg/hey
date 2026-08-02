@@ -82,6 +82,23 @@ export OPENROUTER_API_KEY="your-api-key-here"
 
 You can get an API key from [openrouter.ai](https://openrouter.ai).
 
+## Usage
+
+Run `hey` and type your question at the prompt:
+
+```bash
+hey
+```
+
+To ask a follow-up question that continues the previous answer, use the `-f` (or `--follow-up`) flag:
+
+```bash
+hey -f
+```
+
+> [!NOTE]
+> Conversation history is kept separately per terminal, so using `-f` only continues the last conversation held in *that* terminal — it won't pick up context from other terminals. Only the most recent conversation is remembered (no long-term history).
+
 ## Requirements
 
 - Rust toolchain (edition 2024)
@@ -142,4 +159,6 @@ See [AGENTS.md](AGENTS.md) for repo layout, build commands, and the release chec
 
 5. Add a new feature that allows to continue the discussion
 
-   - [ ] It should be possible to continue the discussion to add a follow-up questions. This should be possible by using the `-c` or `--continue` flag
+   - [x] It should be possible to continue the discussion to add a follow-up questions.
+         This should be possible by using the `-f` or `--follow-up` flag.
+         It should be possible to continue the last conversation (only). No need to support the full history.
