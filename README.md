@@ -97,7 +97,13 @@ hey -f
 ```
 
 > [!NOTE]
-> Conversation history is kept separately per terminal, so using `-f` only continues the last conversation held in *that* terminal — it won't pick up context from other terminals. Only the most recent conversation is remembered (no long-term history).
+> Conversation history is kept separately per terminal, so using `-f` only continues the last conversation held in _that_ terminal — it won't pick up context from other terminals. Only the most recent conversation is remembered (no long-term history).
+
+Use `-h` (or `--help`) to print usage information:
+
+```bash
+hey --help
+```
 
 ## Requirements
 
@@ -162,3 +168,7 @@ See [AGENTS.md](AGENTS.md) for repo layout, build commands, and the release chec
    - [x] It should be possible to continue the discussion to add a follow-up questions.
          This should be possible by using the `-f` or `--follow-up` flag.
          It should be possible to continue the last conversation (only). No need to support the full history.
+
+6. Support for `--help` option
+
+   - [x] Implement the help functionality that will be triggered by the `--help` option.

@@ -1,3 +1,4 @@
+mod cli;
 mod client;
 mod config;
 mod history;
@@ -36,6 +37,11 @@ fn run(follow_up: bool) -> Result<(), String> {
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
+
+    if args.iter().any(|arg| arg == "--help" || arg == "-h") {
+        cli::print_help();
+        return ExitCode::SUCCESS;
+    }
 
     if args.iter().any(|arg| arg == "--version" || arg == "-V") {
         println!("hey version {}", env!("CARGO_PKG_VERSION"));

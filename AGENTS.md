@@ -32,6 +32,7 @@ Releases are tag-triggered (`.github/workflows/release.yml` on push of `v*` tags
 
 - Keep `CHANGELOG.md` updated under `[Unreleased]` for any user-facing change (Keep a Changelog format).
 - Versioning is semver, but pre-1.0: `y` bumps for breaking changes, `z` for fixes (see README.md#versioning).
+- Update the `Usage` section in the `README.md` file whenever there are functional changes that are affecting the user experience. (e.g. new option added, removed or behavior modified).
 
 ## Code style
 

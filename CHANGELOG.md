@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `-f`/`--follow-up` flag to continue the previous conversation with a follow-up question. Conversation history is scoped per terminal (keyed by the controlling TTY), so multiple open terminals don't mix contexts.
+- `-h`/`--help` flag to print usage information.
 - `install.sh` now checks whether `OPENROUTER_API_KEY` is set and, if not, guides the user to get a key from [openrouter.ai](https://openrouter.ai) and add it to their environment (and to `.bashrc`/`.zshrc`).
 
 ### Changed
