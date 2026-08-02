@@ -172,3 +172,15 @@ See [AGENTS.md](AGENTS.md) for repo layout, build commands, and the release chec
 6. Support for `--help` option
 
    - [x] Implement the help functionality that will be triggered by the `--help` option.
+
+7. Implement unit tests
+
+   - [ ] Implement unit tests for the application.
+   - [ ] Add a new entry to the `./AGENTS.md` file that asks to always write unit tests for the new functionality.
+   - [ ] Create new GitHub action to run unit tests on each push.
+
+8. Implement _buddies_, assistants that can be selected and individually configured
+
+   - [ ] Modify the configuration module to accept the configuration file. File should be called `hey.toml` and be located in `.config/hey` directory.
+         Things that are now hardcoded in the configuration module should stay hardcoded and used as defaults. The `hey.toml` configuration file should allow to overvrite them.
+   - more to come...
