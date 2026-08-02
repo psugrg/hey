@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0]
+
 ### Added
 
 - `-f`/`--follow-up` flag to continue the previous conversation with a follow-up question. Conversation history is scoped per terminal (keyed by the controlling TTY), so multiple open terminals don't mix contexts.
