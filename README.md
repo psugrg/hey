@@ -183,4 +183,23 @@ See [AGENTS.md](AGENTS.md) for repo layout, build commands, and the release chec
 
    - [ ] Modify the configuration module to accept the configuration file. File should be called `hey.toml` and be located in `.config/hey` directory.
          Things that are now hardcoded in the configuration module should stay hardcoded and used as defaults. The `hey.toml` configuration file should allow to overvrite them.
+   - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
+
+     _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
+     Example configuration:
+
+     ```toml
+     # the default one is called without a name
+     [[baddies]]
+     default = true
+     name = "Tom"
+     model = "openai/gpt-4o-mini"
+     system_prompt = "your name is tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+
+     [[baddies]]
+     name = "John"
+     model = "x-ai/grok-4.5"
+     system_prompt = "your name is john and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+     ```
+
    - more to come...
