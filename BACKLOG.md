@@ -49,24 +49,31 @@
 8. Implement _buddies_, assistants that can be selected and individually configured
 
    - [ ] Modify the configuration module to accept the configuration file. File should be called `hey.toml` and be located in `.config/hey` directory.
-         Things that are now hardcoded in the configuration module should stay hardcoded and used as defaults. The `hey.toml` configuration file should allow to overvrite them.
+         Things that are now hardcoded in the configuration module should stay there and used should be used as defaults.
+         The `hey.toml` configuration file should allow to overvrite the defaults.
    - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
 
      _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
      Example configuration:
 
      ```toml
-     # the default one is called without a name
+     # the default one can be called without a name
      [[baddies]]
      default = true
      name = "Tom"
      model = "openai/gpt-4o-mini"
-     system_prompt = "your name is tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+     system_prompt = "your name is Tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
 
      [[baddies]]
      name = "John"
-     model = "x-ai/grok-4.5"
-     system_prompt = "your name is john and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+     model = "google/gemini-2.5-flash-lit"
+     system_prompt = "your name is John and you are a helpful english teacher that can translate words and phrases and explain their meaning to the user who asked the question"
      ```
+
+     If there are more `buddies` marked as `default`, the first one of them should be a default one.
+
+     If the configuration file is missing, or if there is no `buddies` configured, the `hey` application should use the hardcoded default one, as it is right now.
+
+   - [ ] Document the configuration file in a dedicated section of the ./README.md` file.
 
    - more to come...
