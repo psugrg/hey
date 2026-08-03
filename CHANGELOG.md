@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Moved the backlog out of `README.md` into a dedicated `BACKLOG.md` file.
+
 ## [0.3.0]
 
 ### Added

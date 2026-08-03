@@ -8,7 +8,7 @@
   - `client.rs` — OpenRouter API calls + "Thinking..." spinner.
   - `prompt.rs` — terminal question input.
   - `render.rs` — renders answers, including fenced code block styling.
-- Root of the repo (`README.md`, `install.sh`, `CHANGELOG.md`, `RELEASING.md`) is documentation/release tooling, not crate code.
+- Root of the repo (`README.md`, `install.sh`, `CHANGELOG.md`, `RELEASING.md`, `BACKLOG.md`) is documentation/release tooling, not crate code.
 - No test suite exists in this repo.
 
 ## Build / run

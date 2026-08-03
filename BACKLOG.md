@@ -1,0 +1,72 @@
+# Backlog
+
+1. Refactor the code by making smaller modules that are easier to maintain
+
+   - [x] Extract the `config` module (API key, AI model, color scheme)
+   - [x] Extract the `render` module (answer rendering)
+   - [x] Extract the `client` module (OpenRouter API client and spinner logic)
+   - [x] Extract the `prompt` module (question input)
+
+2. Create Github actions to generate the release assets
+
+   - [x] Automatically build and publish the `linux_amd64` release asset (`hey_x.x.x_linux_amd64.tar.gz`) on tag push
+
+3. Installation script
+
+   - [x] Add the `install.sh` script that will install the latest release version from the repository.
+
+     The link to the repository `https://github.com/psugrg/hey`.
+     The example path to the asset `https://github.com/psugrg/hey/releases/download/v0.1.0/hey_0.1.0_linux_amd64.tar.gz`.
+     The example invocation `curl -fsSL https://github.com/psugrg/hey/install.sh | sh`.
+
+   - [x] Extend the installation instructions to contain the step of installing the lates version with `curl`.
+   - [x] The installation script should also check if the `OPENROUTER_API_KEY` is available and set. If not,
+         the script should guide the user where to register it and how to add it to the environment variable (and to `.bashrc` and `.zshrc`).
+
+4. Create `AGENTS.md` file
+
+   - [x] Initialize the project in `opencode` with `/init` command to create the `AGENTS.md` file. More on that [here](https://opencode.ai/docs/rules/)
+   - [x] Cleanup the `README.md` file to not to duplicate information from `AGENTS.md`
+   - [x] Add rule to modularize the application. This means that the agent should not keep everything in one file but rather create software modules.
+   - [x] Add rule to minimize commets in code. The code should be self-explanatory. Only the inrerfaces should be properly documented.
+
+5. Add a new feature that allows to continue the discussion
+
+   - [x] It should be possible to continue the discussion to add a follow-up questions.
+         This should be possible by using the `-f` or `--follow-up` flag.
+         It should be possible to continue the last conversation (only). No need to support the full history.
+
+6. Support for `--help` option
+
+   - [x] Implement the help functionality that will be triggered by the `--help` option.
+
+7. Implement unit tests
+
+   - [ ] Implement unit tests for the application.
+   - [ ] Add a new entry to the `./AGENTS.md` file that asks to always write unit tests for the new functionality.
+   - [ ] Create new GitHub action to run unit tests on each push.
+
+8. Implement _buddies_, assistants that can be selected and individually configured
+
+   - [ ] Modify the configuration module to accept the configuration file. File should be called `hey.toml` and be located in `.config/hey` directory.
+         Things that are now hardcoded in the configuration module should stay hardcoded and used as defaults. The `hey.toml` configuration file should allow to overvrite them.
+   - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
+
+     _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
+     Example configuration:
+
+     ```toml
+     # the default one is called without a name
+     [[baddies]]
+     default = true
+     name = "Tom"
+     model = "openai/gpt-4o-mini"
+     system_prompt = "your name is tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+
+     [[baddies]]
+     name = "John"
+     model = "x-ai/grok-4.5"
+     system_prompt = "your name is john and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+     ```
+
+   - more to come...
