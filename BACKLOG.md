@@ -51,6 +51,9 @@
    - [ ] Modify the configuration module to accept the configuration file. File should be called `hey.toml` and be located in `.config/hey` directory.
          Things that are now hardcoded in the configuration module should stay there and used should be used as defaults.
          The `hey.toml` configuration file should allow to overvrite the defaults.
+
+         > Important: The API key should still be fetched from the environment variable for security reasons. (Some users push their configuration to Github)
+
    - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
 
      _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
@@ -75,5 +78,3 @@
      If the configuration file is missing, or if there is no `buddies` configured, the `hey` application should use the hardcoded default one, as it is right now.
 
    - [ ] Document the configuration file in a dedicated section of the ./README.md` file.
-
-   - more to come...
