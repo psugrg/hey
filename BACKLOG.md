@@ -48,11 +48,15 @@
 
 8. Implement _buddies_, assistants that can be selected and individually configured
 
-   - [ ] Modify the configuration module to accept the configuration file. File should be called `hey.toml` and be located in `.config/hey` directory.
-         Things that are now hardcoded in the configuration module should stay there and used should be used as defaults.
-         The `hey.toml` configuration file should allow to overvrite the defaults.
+   - [ ] Modify the configuration module to accept the configuration file.
 
-         > Important: The API key should still be fetched from the environment variable for security reasons. (Some users push their configuration to Github)
+     File should be called `hey.toml` and be located in `.config/hey` directory.
+     Things that are now hardcoded in the configuration module should stay there and used should be used as defaults.
+     The `hey.toml` configuration file should allow to overvrite the defaults.
+
+     > [!IMPORTANT]
+     > The API key should still be fetched from the environment variable for security reasons.
+     > (Some users push their configuration to Github).
 
    - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
 
