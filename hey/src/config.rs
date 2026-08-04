@@ -50,7 +50,7 @@ pub struct Config {
 
 /// Shape of `~/.config/hey.toml`. All fields are optional; missing fields
 /// fall back to the hardcoded defaults.
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, Debug, PartialEq)]
 struct FileConfig {
     model: Option<String>,
     api_url: Option<String>,
@@ -58,6 +58,11 @@ struct FileConfig {
 }
 
 impl FileConfig {
+    /// Parses the contents of a `hey.toml` file.
+    fn parse(contents: &str) -> Result<Self, String> {
+        toml::from_str(contents).map_err(|err| format!("Invalid hey.toml: {err}"))
+    }
+
     /// Reads and parses `~/.config/hey.toml`.
     ///
     /// Returns the default (empty) config if the file doesn't exist. Fails
@@ -73,8 +78,21 @@ impl FileConfig {
             Err(_) => return Ok(FileConfig::default()),
         };
 
-        toml::from_str(&contents)
-            .map_err(|err| format!("Failed to parse {}: {err}", path.display()))
+        FileConfig::parse(&contents).map_err(|err| format!("Failed to parse {}: {err}", path.display()))
+    }
+}
+
+/// Builds the [`Model`] settings from the required API key and the optional
+/// file overrides, falling back to the hardcoded defaults for any field the
+/// file doesn't set.
+fn build_model(api_key: String, file_config: FileConfig) -> Model {
+    Model {
+        api_key,
+        name: file_config.model.unwrap_or_else(|| DEFAULT_MODEL.to_string()),
+        api_url: file_config.api_url.unwrap_or_else(|| DEFAULT_API_URL.to_string()),
+        system_prompt: file_config
+            .system_prompt
+            .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string()),
     }
 }
 
@@ -92,17 +110,106 @@ impl Config {
         let file_config = FileConfig::load()?;
 
         Ok(Config {
-            model: Model {
-                api_key,
-                name: file_config.model.unwrap_or_else(|| DEFAULT_MODEL.to_string()),
-                api_url: file_config.api_url.unwrap_or_else(|| DEFAULT_API_URL.to_string()),
-                system_prompt: file_config
-                    .system_prompt
-                    .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string()),
-            },
+            model: build_model(api_key, file_config),
             theme: Theme::default(),
             prompt_width: DEFAULT_PROMPT_WIDTH,
             prompt_marker: DEFAULT_PROMPT_MARKER.to_string(),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_full_toml() {
+        let file_config = FileConfig::parse(
+            r#"
+            model = "openai/gpt-4o"
+            api_url = "https://example.com/api"
+            system_prompt = "custom prompt"
+            "#,
+        )
+        .unwrap();
+
+        assert_eq!(file_config.model.as_deref(), Some("openai/gpt-4o"));
+        assert_eq!(file_config.api_url.as_deref(), Some("https://example.com/api"));
+        assert_eq!(file_config.system_prompt.as_deref(), Some("custom prompt"));
+    }
+
+    #[test]
+    fn parses_partial_toml() {
+        let file_config = FileConfig::parse(r#"model = "openai/gpt-4o""#).unwrap();
+
+        assert_eq!(file_config.model.as_deref(), Some("openai/gpt-4o"));
+        assert_eq!(file_config.api_url, None);
+        assert_eq!(file_config.system_prompt, None);
+    }
+
+    #[test]
+    fn parses_empty_toml_as_defaults() {
+        let file_config = FileConfig::parse("").unwrap();
+
+        assert_eq!(file_config.model, None);
+        assert_eq!(file_config.api_url, None);
+        assert_eq!(file_config.system_prompt, None);
+    }
+
+    #[test]
+    fn rejects_invalid_toml() {
+        let result = FileConfig::parse("model = ");
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn build_model_falls_back_to_defaults_when_file_config_is_empty() {
+        let model = build_model("key".to_string(), FileConfig::default());
+
+        assert_eq!(model.api_key, "key");
+        assert_eq!(model.name, DEFAULT_MODEL);
+        assert_eq!(model.api_url, DEFAULT_API_URL);
+        assert_eq!(model.system_prompt, DEFAULT_SYSTEM_PROMPT);
+    }
+
+    #[test]
+    fn build_model_uses_file_overrides_when_present() {
+        let file_config = FileConfig {
+            model: Some("custom/model".to_string()),
+            api_url: Some("https://custom.example/api".to_string()),
+            system_prompt: Some("custom prompt".to_string()),
+        };
+
+        let model = build_model("key".to_string(), file_config);
+
+        assert_eq!(model.api_key, "key");
+        assert_eq!(model.name, "custom/model");
+        assert_eq!(model.api_url, "https://custom.example/api");
+        assert_eq!(model.system_prompt, "custom prompt");
+    }
+
+    #[test]
+    fn build_model_mixes_overrides_and_defaults() {
+        let file_config = FileConfig {
+            model: Some("custom/model".to_string()),
+            api_url: None,
+            system_prompt: None,
+        };
+
+        let model = build_model("key".to_string(), file_config);
+
+        assert_eq!(model.name, "custom/model");
+        assert_eq!(model.api_url, DEFAULT_API_URL);
+        assert_eq!(model.system_prompt, DEFAULT_SYSTEM_PROMPT);
+    }
+
+    #[test]
+    fn theme_default_has_expected_colors() {
+        let theme = Theme::default();
+
+        assert_eq!(theme.code_snippet_border_color, "\x1b[90m");
+        assert_eq!(theme.code_snippet_text_color, "\x1b[94m");
+        assert_eq!(theme.reset, "\x1b[0m");
     }
 }

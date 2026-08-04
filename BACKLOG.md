@@ -67,6 +67,8 @@
      > (Some users push their configuration to Github).
 
    - [x] Update the `Configuration` section of the `./README.md` file by adding the subsection `Configuration file` and explaining all configuration options with examples.
+   - [x] Implement the unit tests for the `Configuration` module
+   - [ ] Implement the integration tests for the `Configuration` module
 
 9. Implement _buddies_, assistants that can be selected and individually configured
 
