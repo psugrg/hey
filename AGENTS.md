@@ -11,6 +11,12 @@
 - Root of the repo (`README.md`, `install.sh`, `CHANGELOG.md`, `RELEASING.md`, `BACKLOG.md`) is documentation/release tooling, not crate code.
 - No test suite exists in this repo.
 
+## Platform support
+
+- Supports both Linux and macOS.
+- Linux binary is built automatically by the release workflow (`.github/workflows/release.yml`) when a `v*` tag is pushed.
+- macOS binary is not published by CI; macOS users must build from source (`cargo build --release`) themselves.
+
 ## Build / run
 
 ```bash
