@@ -82,6 +82,21 @@ export OPENROUTER_API_KEY="your-api-key-here"
 
 You can get an API key from [openrouter.ai](https://openrouter.ai).
 
+### Configuration file
+
+You can override the default model, API URL and system prompt by creating `~/.config/hey.toml`:
+
+```toml
+model = "openai/gpt-4o-mini"
+api_url = "https://openrouter.ai/api/v1/chat/completions"
+system_prompt = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage."
+```
+
+All fields are optional; any field omitted from the file falls back to its default value shown above. If the file doesn't exist, `hey` uses the defaults as-is.
+
+> [!NOTE]
+> The API key is never read from `hey.toml`. It must always be set via the `OPENROUTER_API_KEY` environment variable.
+
 ## Usage
 
 Run `hey` and type your question at the prompt:

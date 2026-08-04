@@ -48,7 +48,7 @@
 
 8. Implement support for configuration file
 
-   - [ ] Modify the configuration module to accept the configuration file.
+   - [x] Modify the configuration module to accept the configuration file.
 
      File should be called `hey.toml` and be located in `.config` directory.
      Things that are now hardcoded in the configuration module should stay there and used should be used as defaults.
@@ -66,7 +66,7 @@
      > The API key should still be fetched from the environment variable for security reasons.
      > (Some users push their configuration to Github).
 
-   - [ ] Update the `Configuration` section of the `./README.md` file by adding the subsection `Configuration file` and explaining all configuration options with examples.
+   - [x] Update the `Configuration` section of the `./README.md` file by adding the subsection `Configuration file` and explaining all configuration options with examples.
 
 9. Implement _buddies_, assistants that can be selected and individually configured
 

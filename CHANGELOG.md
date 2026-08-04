@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for a `~/.config/hey.toml` configuration file to override the default model, API URL and system prompt.
+
 ### Changed
 
 - Moved the backlog out of `README.md` into a dedicated `BACKLOG.md` file.
+
+### Removed
+
+- Support for the `OPENROUTER_MODEL` environment variable (breaking change). Use `~/.config/hey.toml` instead.
 
 ## [0.3.0]
 

@@ -1,9 +1,11 @@
 //! Application configuration: AI model settings and UI theme.
 //!
-//! Currently sourced entirely from environment variables (plus fixed
-//! defaults for values that aren't yet user-configurable). This module is
-//! intentionally small but structured so it can grow (e.g. reading from a
-//! config file) without changing how the rest of the app consumes it.
+//! The API key always comes from the `OPENROUTER_API_KEY` environment
+//! variable. The model, API URL and system prompt can be overridden via
+//! `~/.config/hey.toml`; if that file is absent, or a value is omitted,
+//! the hardcoded defaults below are used.
+
+use serde::Deserialize;
 
 const DEFAULT_MODEL: &str = "openai/gpt-4o-mini";
 const DEFAULT_API_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
@@ -46,11 +48,40 @@ pub struct Config {
     pub prompt_marker: String,
 }
 
-impl Config {
-    /// Loads configuration from the environment.
+/// Shape of `~/.config/hey.toml`. All fields are optional; missing fields
+/// fall back to the hardcoded defaults.
+#[derive(Deserialize, Default)]
+struct FileConfig {
+    model: Option<String>,
+    api_url: Option<String>,
+    system_prompt: Option<String>,
+}
+
+impl FileConfig {
+    /// Reads and parses `~/.config/hey.toml`.
     ///
-    /// Requires `OPENROUTER_API_KEY` to be set. `OPENROUTER_MODEL` is
-    /// optional and defaults to [`DEFAULT_MODEL`].
+    /// Returns the default (empty) config if the file doesn't exist. Fails
+    /// if the file exists but isn't valid TOML.
+    fn load() -> Result<Self, String> {
+        let path = match std::env::var("HOME") {
+            Ok(home) => std::path::PathBuf::from(home).join(".config").join("hey.toml"),
+            Err(_) => return Ok(FileConfig::default()),
+        };
+
+        let contents = match std::fs::read_to_string(&path) {
+            Ok(contents) => contents,
+            Err(_) => return Ok(FileConfig::default()),
+        };
+
+        toml::from_str(&contents)
+            .map_err(|err| format!("Failed to parse {}: {err}", path.display()))
+    }
+}
+
+impl Config {
+    /// Loads configuration from `OPENROUTER_API_KEY` (required) and
+    /// `~/.config/hey.toml` (optional overrides for model, API URL and
+    /// system prompt).
     pub fn load() -> Result<Self, String> {
         let api_key = std::env::var("OPENROUTER_API_KEY").map_err(|_| {
             "OPENROUTER_API_KEY environment variable is not set.\n\
@@ -58,14 +89,16 @@ impl Config {
                 .to_string()
         })?;
 
-        let name = std::env::var("OPENROUTER_MODEL").unwrap_or_else(|_| DEFAULT_MODEL.to_string());
+        let file_config = FileConfig::load()?;
 
         Ok(Config {
             model: Model {
                 api_key,
-                name,
-                api_url: DEFAULT_API_URL.to_string(),
-                system_prompt: DEFAULT_SYSTEM_PROMPT.to_string(),
+                name: file_config.model.unwrap_or_else(|| DEFAULT_MODEL.to_string()),
+                api_url: file_config.api_url.unwrap_or_else(|| DEFAULT_API_URL.to_string()),
+                system_prompt: file_config
+                    .system_prompt
+                    .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string()),
             },
             theme: Theme::default(),
             prompt_width: DEFAULT_PROMPT_WIDTH,
