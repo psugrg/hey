@@ -1,12 +1,6 @@
-mod cli;
-mod client;
-mod config;
-mod history;
-mod prompt;
-mod render;
-
-use client::ChatMessage;
-use config::Config;
+use hey::client::{self, ChatMessage};
+use hey::config::Config;
+use hey::{cli, history, prompt, render};
 use std::process::ExitCode;
 
 fn run(follow_up: bool) -> Result<(), String> {
