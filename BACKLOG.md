@@ -46,17 +46,29 @@
    - [ ] Add a new entry to the `./AGENTS.md` file that asks to always write unit tests for the new functionality.
    - [ ] Create new GitHub action to run unit tests on each push.
 
-8. Implement _buddies_, assistants that can be selected and individually configured
+8. Implement support for configuration file
 
    - [ ] Modify the configuration module to accept the configuration file.
 
-     File should be called `hey.toml` and be located in `.config/hey` directory.
+     File should be called `hey.toml` and be located in `.config` directory.
      Things that are now hardcoded in the configuration module should stay there and used should be used as defaults.
      The `hey.toml` configuration file should allow to overvrite the defaults.
+
+     List of elements that should be configurable:
+     - default model
+
+       The support for model from environment variable `OPENROUTER_MODEL` should be dropped (braking change).
+
+     - default API URL
+     - default system prompt
 
      > [!IMPORTANT]
      > The API key should still be fetched from the environment variable for security reasons.
      > (Some users push their configuration to Github).
+
+   - [ ] Update the `Configuration` section of the `./README.md` file by adding the subsection `Configuration file` and explaining all configuration options with examples.
+
+9. Implement _buddies_, assistants that can be selected and individually configured
 
    - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
 
