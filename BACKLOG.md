@@ -70,29 +70,47 @@
    - [x] Implement the unit tests for the `Configuration` module
    - [x] Implement the integration tests for the `Configuration` module
 
-9. Implement _buddies_, assistants that can be selected and individually configured
+9. Improve the look-and-feel of the `prompt` and the response from the model.
 
-   - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
+   - [ ] Use extended symbols like `○`, `◇`, `◈`, `●`, `│`, `└` and similar, to create a better prompt layot and response layout.
 
-     _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
-     Example configuration:
+   Example layout
 
-     ```toml
-     # the default one can be called without a name
-     [[baddies]]
-     default = true
-     name = "Tom"
-     model = "openai/gpt-4o-mini"
-     system_prompt = "your name is Tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+   ```
+   ◈
+   │› What is the speed of light?
+   ○
+   │ Approximately 299,792,458 meters per second.
+   └ ●
+   ```
 
-     [[baddies]]
-     name = "John"
-     model = "google/gemini-2.5-flash-lit"
-     system_prompt = "your name is John and you are a helpful english teacher that can translate words and phrases and explain their meaning to the user who asked the question"
-     ```
+   Propose a better layout if you think it can be improved
 
-     If there are more `buddies` marked as `default`, the first one of them should be a default one.
+   - [ ] Change the `spinner` to use the following sequence `◜`, `◝`, `◞`, `◟` "in place", which means that they should look like the animated circle.
 
-     If the configuration file is missing, or if there is no `buddies` configured, the `hey` application should use the hardcoded default one, as it is right now.
+10. Implement _buddies_, assistants that can be selected and individually configured
 
-   - [ ] Document the configuration file in a dedicated section of the ./README.md` file.
+    - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
+
+      _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
+      Example configuration:
+
+      ```toml
+      # the default one can be called without a name
+      [[baddies]]
+      default = true
+      name = "Tom"
+      model = "openai/gpt-4o-mini"
+      system_prompt = "your name is Tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+
+      [[baddies]]
+      name = "John"
+      model = "google/gemini-2.5-flash-lit"
+      system_prompt = "your name is John and you are a helpful english teacher that can translate words and phrases and explain their meaning to the user who asked the question"
+      ```
+
+      If there are more `buddies` marked as `default`, the first one of them should be a default one.
+
+      If the configuration file is missing, or if there is no `buddies` configured, the `hey` application should use the hardcoded default one, as it is right now.
+
+    - [ ] Document the configuration file in a dedicated section of the ./README.md` file.
