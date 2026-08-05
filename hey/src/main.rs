@@ -6,7 +6,7 @@ use std::process::ExitCode;
 fn run(follow_up: bool) -> Result<(), String> {
     let config = Config::load()?;
 
-    let question = prompt::get_question(config.prompt_width, &config.prompt_marker)?;
+    let question = prompt::get_question(&config.prompt_marker)?;
 
     let mut messages = if follow_up {
         history::load().unwrap_or_default()

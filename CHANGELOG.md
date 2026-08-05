@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Moved the backlog out of `README.md` into a dedicated `BACKLOG.md` file.
+- Redesigned the prompt and response layout to use box-drawing symbols (`◈`, `○`, `│`, `└`, `●`) instead of plain `─` dividers.
 
 ### Removed
 

@@ -97,6 +97,8 @@ pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Res
 
     let _cursor_guard = CursorGuard::new();
 
+    println!("○");
+
     let dot_counts = [1usize, 2, 3, 4];
     let mut frame = 0;
 

@@ -72,7 +72,7 @@
 
 9. Improve the look-and-feel of the `prompt` and the response from the model.
 
-   - [ ] Use extended symbols like `○`, `◇`, `◈`, `●`, `│`, `└` and similar, to create a better prompt layot and response layout.
+   - [x] Use extended symbols like `○`, `◇`, `◈`, `●`, `│`, `└` and similar, to create a better prompt layot and response layout.
 
    Example layout
 
@@ -87,6 +87,8 @@
    Propose a better layout if you think it can be improved
 
    - [ ] Change the `spinner` to use the following sequence `◜`, `◝`, `◞`, `◟` "in place", which means that they should look like the animated circle.
+
+   The `○` should be printed in place of the spinner after the answer is generated.
 
 10. Implement _buddies_, assistants that can be selected and individually configured
 

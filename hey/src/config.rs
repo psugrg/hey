@@ -14,7 +14,7 @@ pub const DEFAULT_API_URL: &str = "https://openrouter.ai/api/v1/chat/completions
 /// Default system prompt used when `hey.toml` doesn't set one.
 pub const DEFAULT_SYSTEM_PROMPT: &str = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage.";
 const DEFAULT_PROMPT_WIDTH: usize = 60;
-const DEFAULT_PROMPT_MARKER: &str = "> ";
+const DEFAULT_PROMPT_MARKER: &str = "› ";
 
 /// Settings needed to talk to the AI model API.
 pub struct Model {
