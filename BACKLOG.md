@@ -90,6 +90,8 @@
 
    The `○` should be printed in place of the spinner after the answer is generated.
 
+   - [x] Make this function configurable via the `config` module, and via the `hey.toml` file.
+
 10. Implement _buddies_, assistants that can be selected and individually configured
 
     - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.

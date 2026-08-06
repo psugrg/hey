@@ -6,7 +6,7 @@ use std::process::ExitCode;
 fn run(follow_up: bool) -> Result<(), String> {
     let config = Config::load()?;
 
-    let question = prompt::get_question(&config.prompt_marker)?;
+    let question = prompt::get_question(&config.theme)?;
 
     let mut messages = if follow_up {
         history::load().unwrap_or_default()
@@ -19,7 +19,7 @@ fn run(follow_up: bool) -> Result<(), String> {
     }
     messages.push(ChatMessage::user(question));
 
-    let answer = client::fetch_answer_with_spinner(&config.model, &messages)?;
+    let answer = client::fetch_answer_with_spinner(&config.model, &config.theme, &messages)?;
 
     messages.push(ChatMessage::assistant(answer.clone()));
     let _ = history::save(&messages);

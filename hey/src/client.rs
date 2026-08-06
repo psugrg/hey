@@ -1,4 +1,4 @@
-use crate::config::Model;
+use crate::config::{Model, Theme};
 use serde::{Deserialize, Serialize};
 use std::io::{self, Write};
 use std::sync::mpsc;
@@ -76,10 +76,15 @@ impl Drop for CursorGuard {
     }
 }
 
-/// Sends `messages` to the configured model, showing an animated `◜◝◞◟`
-/// spinner in place while waiting, replacing it with `○` once the
-/// response arrives, and returns the trimmed answer text.
-pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Result<String, String> {
+/// Sends `messages` to the configured model, showing an animated spinner
+/// (`theme.spinner_frames`) in place while waiting, replacing it with
+/// `theme.prompt_done_symbol` once the response arrives, and returns the
+/// trimmed answer text.
+pub fn fetch_answer_with_spinner(
+    model: &Model,
+    theme: &Theme,
+    messages: &[ChatMessage],
+) -> Result<String, String> {
     let request_body = ChatRequest {
         model: model.name.clone(),
         messages: messages.to_vec(),
@@ -98,7 +103,6 @@ pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Res
 
     let _cursor_guard = CursorGuard::new();
 
-    let spinner_frames = ['◜', '◝', '◞', '◟'];
     let mut frame = 0;
 
     let result = loop {
@@ -108,16 +112,16 @@ pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Res
                 break Err("Background request thread ended unexpectedly.".to_string());
             }
             Err(mpsc::TryRecvError::Empty) => {
-                print!("\x1b[2K\r{}", spinner_frames[frame % spinner_frames.len()]);
+                print!("\x1b[2K\r{}", theme.spinner_frames[frame % theme.spinner_frames.len()]);
                 let _ = io::stdout().flush();
                 frame += 1;
-                thread::sleep(Duration::from_millis(120));
+                thread::sleep(Duration::from_millis(theme.spinner_interval_ms));
             }
         }
     };
 
-    // Replace the spinner with "○" once the answer/error is ready.
-    println!("\x1b[2K\r○");
+    // Replace the spinner with the done symbol once the answer/error is ready.
+    println!("\x1b[2K\r{}", theme.prompt_done_symbol);
 
     result
 }

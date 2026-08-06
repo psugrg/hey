@@ -1,4 +1,8 @@
-use hey::config::{Config, DEFAULT_API_URL, DEFAULT_MODEL, DEFAULT_SYSTEM_PROMPT};
+use hey::config::{
+    Config, DEFAULT_API_URL, DEFAULT_MODEL, DEFAULT_PROMPT_CLOSE_SYMBOL, DEFAULT_PROMPT_DONE_SYMBOL,
+    DEFAULT_PROMPT_LINE_SYMBOL, DEFAULT_PROMPT_MARKER, DEFAULT_PROMPT_TOP_SYMBOL, DEFAULT_SPINNER_INTERVAL_MS,
+    DEFAULT_SYSTEM_PROMPT,
+};
 use std::path::Path;
 use std::sync::Mutex;
 
@@ -37,6 +41,12 @@ fn loads_defaults_when_hey_toml_is_missing() {
     assert_eq!(config.model.name, DEFAULT_MODEL);
     assert_eq!(config.model.api_url, DEFAULT_API_URL);
     assert_eq!(config.model.system_prompt, DEFAULT_SYSTEM_PROMPT);
+    assert_eq!(config.theme.prompt_marker, DEFAULT_PROMPT_MARKER);
+    assert_eq!(config.theme.prompt_top_symbol, DEFAULT_PROMPT_TOP_SYMBOL);
+    assert_eq!(config.theme.prompt_line_symbol, DEFAULT_PROMPT_LINE_SYMBOL);
+    assert_eq!(config.theme.prompt_done_symbol, DEFAULT_PROMPT_DONE_SYMBOL);
+    assert_eq!(config.theme.prompt_close_symbol, DEFAULT_PROMPT_CLOSE_SYMBOL);
+    assert_eq!(config.theme.spinner_interval_ms, DEFAULT_SPINNER_INTERVAL_MS);
 }
 
 #[test]
@@ -59,6 +69,36 @@ fn overrides_defaults_from_hey_toml() {
 }
 
 #[test]
+fn overrides_ui_symbols_from_hey_toml() {
+    let home = tempfile::tempdir().unwrap();
+    write_hey_toml(
+        home.path(),
+        r#"
+        prompt_marker = "> "
+        prompt_top_symbol = "◈"
+        prompt_line_symbol = "│"
+        prompt_done_symbol = "◇"
+        prompt_close_symbol = "*"
+        spinner_frames = ["|", "/", "-", "\\"]
+        spinner_interval_ms = 200
+        "#,
+    );
+
+    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+
+    assert_eq!(config.theme.prompt_marker, "> ");
+    assert_eq!(config.theme.prompt_top_symbol, "◈");
+    assert_eq!(config.theme.prompt_line_symbol, "│");
+    assert_eq!(config.theme.prompt_done_symbol, "◇");
+    assert_eq!(config.theme.prompt_close_symbol, "*");
+    assert_eq!(
+        config.theme.spinner_frames,
+        vec!["|".to_string(), "/".to_string(), "-".to_string(), "\\".to_string()]
+    );
+    assert_eq!(config.theme.spinner_interval_ms, 200);
+}
+
+#[test]
 fn partial_overrides_fall_back_to_defaults() {
     let home = tempfile::tempdir().unwrap();
     write_hey_toml(home.path(), r#"model = "openai/gpt-4o""#);
@@ -68,6 +108,22 @@ fn partial_overrides_fall_back_to_defaults() {
     assert_eq!(config.model.name, "openai/gpt-4o");
     assert_eq!(config.model.api_url, DEFAULT_API_URL);
     assert_eq!(config.model.system_prompt, DEFAULT_SYSTEM_PROMPT);
+    assert_eq!(config.theme.prompt_marker, DEFAULT_PROMPT_MARKER);
+}
+
+#[test]
+fn partial_ui_symbol_overrides_fall_back_to_defaults() {
+    let home = tempfile::tempdir().unwrap();
+    write_hey_toml(home.path(), r#"prompt_marker = "> ""#);
+
+    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+
+    assert_eq!(config.theme.prompt_marker, "> ");
+    assert_eq!(config.theme.prompt_top_symbol, DEFAULT_PROMPT_TOP_SYMBOL);
+    assert_eq!(config.theme.prompt_line_symbol, DEFAULT_PROMPT_LINE_SYMBOL);
+    assert_eq!(config.theme.prompt_done_symbol, DEFAULT_PROMPT_DONE_SYMBOL);
+    assert_eq!(config.theme.prompt_close_symbol, DEFAULT_PROMPT_CLOSE_SYMBOL);
+    assert_eq!(config.theme.spinner_interval_ms, DEFAULT_SPINNER_INTERVAL_MS);
 }
 
 #[test]

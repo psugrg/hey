@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for a `~/.config/hey.toml` configuration file to override the default model, API URL and system prompt.
+- `hey.toml` support for overriding the prompt/response UI symbols (`prompt_marker`, `prompt_top_symbol`, `prompt_line_symbol`, `prompt_done_symbol`, `prompt_close_symbol`) and the spinner animation (`spinner_frames`, `spinner_interval_ms`).
 
 ### Changed
 
