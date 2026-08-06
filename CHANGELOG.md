@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Moved the backlog out of `README.md` into a dedicated `BACKLOG.md` file.
 - Redesigned the prompt and response layout to use box-drawing symbols (`◈`, `○`, `│`, `└`, `●`) instead of plain `─` dividers.
+- Replaced the `...` waiting spinner with an animated `◜◝◞◟` spinner that spins in place, then settles into `○` once the answer is ready.
 
 ### Removed
 

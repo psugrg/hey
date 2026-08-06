@@ -76,8 +76,9 @@ impl Drop for CursorGuard {
     }
 }
 
-/// Sends `messages` to the configured model, showing a spinner
-/// while waiting for the response, and returns the trimmed answer text.
+/// Sends `messages` to the configured model, showing an animated `◜◝◞◟`
+/// spinner in place while waiting, replacing it with `○` once the
+/// response arrives, and returns the trimmed answer text.
 pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Result<String, String> {
     let request_body = ChatRequest {
         model: model.name.clone(),
@@ -97,9 +98,7 @@ pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Res
 
     let _cursor_guard = CursorGuard::new();
 
-    println!("○");
-
-    let dot_counts = [1usize, 2, 3, 4];
+    let spinner_frames = ['◜', '◝', '◞', '◟'];
     let mut frame = 0;
 
     let result = loop {
@@ -109,18 +108,16 @@ pub fn fetch_answer_with_spinner(model: &Model, messages: &[ChatMessage]) -> Res
                 break Err("Background request thread ended unexpectedly.".to_string());
             }
             Err(mpsc::TryRecvError::Empty) => {
-                let dots = ".".repeat(dot_counts[frame % dot_counts.len()]);
-                print!("\x1b[2K\r{dots}");
+                print!("\x1b[2K\r{}", spinner_frames[frame % spinner_frames.len()]);
                 let _ = io::stdout().flush();
                 frame += 1;
-                thread::sleep(Duration::from_millis(400));
+                thread::sleep(Duration::from_millis(120));
             }
         }
     };
 
-    // Clear the "..." line before printing the final answer/error.
-    print!("\x1b[2K\r");
-    let _ = io::stdout().flush();
+    // Replace the spinner with "○" once the answer/error is ready.
+    println!("\x1b[2K\r○");
 
     result
 }

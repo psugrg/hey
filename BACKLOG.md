@@ -77,16 +77,16 @@
    Example layout
 
    ```
-   ◈
-   │› What is the speed of light?
+   ●
+   ╎› What is the speed of light?
    ○
-   │ Approximately 299,792,458 meters per second.
-   └ ●
+   ╎ Approximately 299,792,458 meters per second.
+   └ ◉
    ```
 
    Propose a better layout if you think it can be improved
 
-   - [ ] Change the `spinner` to use the following sequence `◜`, `◝`, `◞`, `◟` "in place", which means that they should look like the animated circle.
+   - [x] Change the `spinner` to use the following sequence `◜`, `◝`, `◞`, `◟` "in place", which means that they should look like the animated circle.
 
    The `○` should be printed in place of the spinner after the answer is generated.
 

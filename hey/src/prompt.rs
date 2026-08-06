@@ -4,8 +4,8 @@ use std::io::{self, Write};
 /// trims it, and returns it as the user's question. Returns an error if the
 /// question is empty.
 pub fn get_question(prompt_marker: &str) -> Result<String, String> {
-    println!("◈");
-    print!("│{prompt_marker}");
+    println!("●");
+    print!("╎{prompt_marker}");
     io::stdout()
         .flush()
         .map_err(|e| format!("Failed to write to stdout: {e}"))?;

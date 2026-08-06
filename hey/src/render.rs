@@ -3,7 +3,7 @@ use crate::config::Theme;
 /// Renders an answer, styling fenced code blocks (```lang ... ```) with a
 /// top/bottom border (showing the language on the top border) and
 /// printing the code lines themselves. Every line, including code block
-/// borders, is nested inside a `│` box that closes with `└ ●`.
+/// borders, is nested inside a `╎` box that closes with `└ ●`.
 pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
     let mut in_code_block = false;
 
@@ -20,7 +20,7 @@ pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
                 };
                 let dash_count = prompt_width.saturating_sub(label.chars().count() + 2);
                 println!(
-                    "│ {}──{label}{}{}",
+                    "╎ {}──{label}{}{}",
                     theme.code_snippet_border_color,
                     "─".repeat(dash_count.max(2)),
                     theme.reset
@@ -28,7 +28,7 @@ pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
                 in_code_block = true;
             } else {
                 println!(
-                    "│ {}{}{}",
+                    "╎ {}{}{}",
                     theme.code_snippet_border_color,
                     "─".repeat(prompt_width),
                     theme.reset
@@ -39,11 +39,11 @@ pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
         }
 
         if in_code_block {
-            println!("│ {}{line}{}", theme.code_snippet_text_color, theme.reset);
+            println!("╎ {}{line}{}", theme.code_snippet_text_color, theme.reset);
         } else {
-            println!("│ {line}");
+            println!("╎ {line}");
         }
     }
 
-    println!("└ ●");
+    println!("└ ◉");
 }
