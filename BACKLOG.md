@@ -78,10 +78,10 @@
 
    ```
    ●
-   ╎› What is the speed of light?
+    › What is the speed of light?
    ○
-   ╎ Approximately 299,792,458 meters per second.
-   └ ◉
+     Approximately 299,792,458 meters per second.
+   ◉
    ```
 
    Propose a better layout if you think it can be improved

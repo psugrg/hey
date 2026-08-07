@@ -22,7 +22,7 @@ pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
                 };
                 let dash_count = prompt_width.saturating_sub(label.chars().count() + 2);
                 println!(
-                    "{line_symbol} {}──{label}{}{}",
+                    "{line_symbol}{}──{label}{}{}",
                     theme.code_snippet_border_color,
                     "─".repeat(dash_count.max(2)),
                     theme.reset
@@ -30,7 +30,7 @@ pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
                 in_code_block = true;
             } else {
                 println!(
-                    "{line_symbol} {}{}{}",
+                    "{line_symbol}{}{}{}",
                     theme.code_snippet_border_color,
                     "─".repeat(prompt_width),
                     theme.reset
@@ -41,11 +41,11 @@ pub fn render_answer(answer: &str, theme: &Theme, prompt_width: usize) {
         }
 
         if in_code_block {
-            println!("{line_symbol} {}{line}{}", theme.code_snippet_text_color, theme.reset);
+            println!("{line_symbol}{}{line}{}", theme.code_snippet_text_color, theme.reset);
         } else {
-            println!("{line_symbol} {line}");
+            println!("{line_symbol}{line}");
         }
     }
 
-    println!("└ {}", theme.prompt_close_symbol);
+    println!("{}", theme.prompt_close_symbol);
 }
