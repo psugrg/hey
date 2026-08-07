@@ -1,4 +1,4 @@
-# ⡗⢺ ⣟ ⢑⡎
+# hey
 
 `hey` is a simple command-line AI assistant for your terminal - right there where you need it.
 

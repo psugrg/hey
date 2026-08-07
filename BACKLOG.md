@@ -104,6 +104,9 @@
 
 10. Implement _buddies_, assistants that can be selected and individually configured
 
+    - [ ] The initial step is to remove the possibility to configure the `model` and `system_prompt` by the `hey.toml` configuration file.
+          This will be replaced by the _buddies_ configuration in the next steps.
+
     - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
 
       _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
@@ -111,13 +114,13 @@
 
       ```toml
       # the default one can be called without a name
-      [[baddies]]
+      [[buddies]]
       default = true
-      name = "Tom"
+      nqqqame = "Tom"
       model = "openai/gpt-4o-mini"
       system_prompt = "your name is Tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
 
-      [[baddies]]
+      [[buddies]]
       name = "John"
       model = "google/gemini-2.5-flash-lit"
       system_prompt = "your name is John and you are a helpful english teacher that can translate words and phrases and explain their meaning to the user who asked the question"
@@ -125,6 +128,10 @@
 
       If there are more `buddies` marked as `default`, the first one of them should be a default one.
 
+      If the `default` `buddy` is missing, the first one from the configuration file is used as the default one.
+
       If the configuration file is missing, or if there is no `buddies` configured, the `hey` application should use the hardcoded default one, as it is right now.
 
-    - [ ] Document the configuration file in a dedicated section of the ./README.md` file.
+    - [ ] Document the configuration the ./README.md` file.
+
+    - [ ] Implement unit tests and integration tests
