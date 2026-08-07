@@ -91,10 +91,10 @@ model = "openai/gpt-4o-mini"
 api_url = "https://openrouter.ai/api/v1/chat/completions"
 system_prompt = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage."
 prompt_marker = "› "
-prompt_top_symbol = "●"
-prompt_line_symbol = "╎"
-prompt_done_symbol = "○"
-prompt_close_symbol = "◉"
+prompt_open = "●"
+prompt_line = "╎"
+prompt_done = "○"
+prompt_close = "◉"
 spinner_frames = ["◜", "◝", "◞", "◟"]
 spinner_interval_ms = 120
 ```
@@ -102,10 +102,10 @@ spinner_interval_ms = 120
 All fields are optional; any field omitted from the file falls back to its default value shown above. If the file doesn't exist, `hey` uses the defaults as-is.
 
 - `prompt_marker`: printed right before you type your question.
-- `prompt_top_symbol`: printed on its own line above the question.
-- `prompt_line_symbol`: printed at the start of every question/answer line, including code block borders.
-- `prompt_done_symbol`: replaces the spinner once the answer is ready.
-- `prompt_close_symbol`: printed after `└` to close the answer box.
+- `prompt_open`: printed on its own line above the question.
+- `prompt_line`: printed at the start of every question/answer line, including code block borders.
+- `prompt_done`: replaces the spinner once the answer is ready.
+- `prompt_close`: printed on its own line to close the answer box.
 - `spinner_frames`: the animation frames shown in place while waiting for a response.
 - `spinner_interval_ms`: delay in milliseconds between spinner frames.
 

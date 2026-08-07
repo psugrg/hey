@@ -91,6 +91,16 @@
    The `○` should be printed in place of the spinner after the answer is generated.
 
    - [x] Make this function configurable via the `config` module, and via the `hey.toml` file.
+   - [x] Rename the following configuration variables (both in code and in the configuration file)
+
+     - `prompt_top_symbol` -> `prompt_open`
+     - `prompt_line_symbol` -> `prompt_line`
+     - `prompt_done_symbol` -> `prompt_done`
+     - `prompt_close_symbol` -> `prompt_close`
+
+     The change is motivated by the fact that the application handles not only one symbol, but it actually handles the whole string (which is even better).
+
+     Don't forget to update the readme section!
 
 10. Implement _buddies_, assistants that can be selected and individually configured
 

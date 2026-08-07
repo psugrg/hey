@@ -1,6 +1,6 @@
 use hey::config::{
-    Config, DEFAULT_API_URL, DEFAULT_MODEL, DEFAULT_PROMPT_CLOSE_SYMBOL, DEFAULT_PROMPT_DONE_SYMBOL,
-    DEFAULT_PROMPT_LINE_SYMBOL, DEFAULT_PROMPT_MARKER, DEFAULT_PROMPT_TOP_SYMBOL, DEFAULT_SPINNER_INTERVAL_MS,
+    Config, DEFAULT_API_URL, DEFAULT_MODEL, DEFAULT_PROMPT_CLOSE, DEFAULT_PROMPT_DONE,
+    DEFAULT_PROMPT_LINE, DEFAULT_PROMPT_MARKER, DEFAULT_PROMPT_OPEN, DEFAULT_SPINNER_INTERVAL_MS,
     DEFAULT_SYSTEM_PROMPT,
 };
 use std::path::Path;
@@ -42,10 +42,10 @@ fn loads_defaults_when_hey_toml_is_missing() {
     assert_eq!(config.model.api_url, DEFAULT_API_URL);
     assert_eq!(config.model.system_prompt, DEFAULT_SYSTEM_PROMPT);
     assert_eq!(config.theme.prompt_marker, DEFAULT_PROMPT_MARKER);
-    assert_eq!(config.theme.prompt_top_symbol, DEFAULT_PROMPT_TOP_SYMBOL);
-    assert_eq!(config.theme.prompt_line_symbol, DEFAULT_PROMPT_LINE_SYMBOL);
-    assert_eq!(config.theme.prompt_done_symbol, DEFAULT_PROMPT_DONE_SYMBOL);
-    assert_eq!(config.theme.prompt_close_symbol, DEFAULT_PROMPT_CLOSE_SYMBOL);
+    assert_eq!(config.theme.prompt_open, DEFAULT_PROMPT_OPEN);
+    assert_eq!(config.theme.prompt_line, DEFAULT_PROMPT_LINE);
+    assert_eq!(config.theme.prompt_done, DEFAULT_PROMPT_DONE);
+    assert_eq!(config.theme.prompt_close, DEFAULT_PROMPT_CLOSE);
     assert_eq!(config.theme.spinner_interval_ms, DEFAULT_SPINNER_INTERVAL_MS);
 }
 
@@ -75,10 +75,10 @@ fn overrides_ui_symbols_from_hey_toml() {
         home.path(),
         r#"
         prompt_marker = "> "
-        prompt_top_symbol = "◈"
-        prompt_line_symbol = "│"
-        prompt_done_symbol = "◇"
-        prompt_close_symbol = "*"
+        prompt_open = "◈"
+        prompt_line = "│"
+        prompt_done = "◇"
+        prompt_close = "*"
         spinner_frames = ["|", "/", "-", "\\"]
         spinner_interval_ms = 200
         "#,
@@ -87,10 +87,10 @@ fn overrides_ui_symbols_from_hey_toml() {
     let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
 
     assert_eq!(config.theme.prompt_marker, "> ");
-    assert_eq!(config.theme.prompt_top_symbol, "◈");
-    assert_eq!(config.theme.prompt_line_symbol, "│");
-    assert_eq!(config.theme.prompt_done_symbol, "◇");
-    assert_eq!(config.theme.prompt_close_symbol, "*");
+    assert_eq!(config.theme.prompt_open, "◈");
+    assert_eq!(config.theme.prompt_line, "│");
+    assert_eq!(config.theme.prompt_done, "◇");
+    assert_eq!(config.theme.prompt_close, "*");
     assert_eq!(
         config.theme.spinner_frames,
         vec!["|".to_string(), "/".to_string(), "-".to_string(), "\\".to_string()]
@@ -119,10 +119,10 @@ fn partial_ui_symbol_overrides_fall_back_to_defaults() {
     let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
 
     assert_eq!(config.theme.prompt_marker, "> ");
-    assert_eq!(config.theme.prompt_top_symbol, DEFAULT_PROMPT_TOP_SYMBOL);
-    assert_eq!(config.theme.prompt_line_symbol, DEFAULT_PROMPT_LINE_SYMBOL);
-    assert_eq!(config.theme.prompt_done_symbol, DEFAULT_PROMPT_DONE_SYMBOL);
-    assert_eq!(config.theme.prompt_close_symbol, DEFAULT_PROMPT_CLOSE_SYMBOL);
+    assert_eq!(config.theme.prompt_open, DEFAULT_PROMPT_OPEN);
+    assert_eq!(config.theme.prompt_line, DEFAULT_PROMPT_LINE);
+    assert_eq!(config.theme.prompt_done, DEFAULT_PROMPT_DONE);
+    assert_eq!(config.theme.prompt_close, DEFAULT_PROMPT_CLOSE);
     assert_eq!(config.theme.spinner_interval_ms, DEFAULT_SPINNER_INTERVAL_MS);
 }
 

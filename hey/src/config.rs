@@ -17,15 +17,15 @@ const DEFAULT_PROMPT_WIDTH: usize = 60;
 /// Default question marker used when `hey.toml` doesn't set one.
 pub const DEFAULT_PROMPT_MARKER: &str = "› ";
 /// Default symbol printed above the question when `hey.toml` doesn't set one.
-pub const DEFAULT_PROMPT_TOP_SYMBOL: &str = "●";
+pub const DEFAULT_PROMPT_OPEN: &str = "●";
 /// Default box line symbol used when `hey.toml` doesn't set one.
-pub const DEFAULT_PROMPT_LINE_SYMBOL: &str = "╎";
+pub const DEFAULT_PROMPT_LINE: &str = "╎";
 /// Default symbol shown once the answer is ready, replacing the spinner,
 /// when `hey.toml` doesn't set one.
-pub const DEFAULT_PROMPT_DONE_SYMBOL: &str = "○";
-/// Default symbol printed after `└` to close the answer box when
+pub const DEFAULT_PROMPT_DONE: &str = "○";
+/// Default symbol printed on its own line to close the answer box when
 /// `hey.toml` doesn't set one.
-pub const DEFAULT_PROMPT_CLOSE_SYMBOL: &str = "◉";
+pub const DEFAULT_PROMPT_CLOSE: &str = "◉";
 /// Default spinner animation frames used when `hey.toml` doesn't set them.
 pub const DEFAULT_SPINNER_FRAMES: &[&str] = &["◜", "◝", "◞", "◟"];
 /// Default delay between spinner frames, in milliseconds, used when
@@ -49,10 +49,10 @@ pub struct Theme {
     pub code_snippet_text_color: &'static str,
     pub reset: &'static str,
     pub prompt_marker: String,
-    pub prompt_top_symbol: String,
-    pub prompt_line_symbol: String,
-    pub prompt_done_symbol: String,
-    pub prompt_close_symbol: String,
+    pub prompt_open: String,
+    pub prompt_line: String,
+    pub prompt_done: String,
+    pub prompt_close: String,
     pub spinner_frames: Vec<String>,
     pub spinner_interval_ms: u64,
 }
@@ -64,10 +64,10 @@ impl Default for Theme {
             code_snippet_text_color: "\x1b[94m",
             reset: "\x1b[0m",
             prompt_marker: DEFAULT_PROMPT_MARKER.to_string(),
-            prompt_top_symbol: DEFAULT_PROMPT_TOP_SYMBOL.to_string(),
-            prompt_line_symbol: DEFAULT_PROMPT_LINE_SYMBOL.to_string(),
-            prompt_done_symbol: DEFAULT_PROMPT_DONE_SYMBOL.to_string(),
-            prompt_close_symbol: DEFAULT_PROMPT_CLOSE_SYMBOL.to_string(),
+            prompt_open: DEFAULT_PROMPT_OPEN.to_string(),
+            prompt_line: DEFAULT_PROMPT_LINE.to_string(),
+            prompt_done: DEFAULT_PROMPT_DONE.to_string(),
+            prompt_close: DEFAULT_PROMPT_CLOSE.to_string(),
             spinner_frames: DEFAULT_SPINNER_FRAMES.iter().map(|s| s.to_string()).collect(),
             spinner_interval_ms: DEFAULT_SPINNER_INTERVAL_MS,
         }
@@ -89,10 +89,10 @@ struct FileConfig {
     api_url: Option<String>,
     system_prompt: Option<String>,
     prompt_marker: Option<String>,
-    prompt_top_symbol: Option<String>,
-    prompt_line_symbol: Option<String>,
-    prompt_done_symbol: Option<String>,
-    prompt_close_symbol: Option<String>,
+    prompt_open: Option<String>,
+    prompt_line: Option<String>,
+    prompt_done: Option<String>,
+    prompt_close: Option<String>,
     spinner_frames: Option<Vec<String>>,
     spinner_interval_ms: Option<u64>,
 }
@@ -144,22 +144,22 @@ fn build_theme(file_config: &FileConfig) -> Theme {
 
     Theme {
         prompt_marker: file_config.prompt_marker.clone().unwrap_or(defaults.prompt_marker),
-        prompt_top_symbol: file_config
-            .prompt_top_symbol
+        prompt_open: file_config
+            .prompt_open
             .clone()
-            .unwrap_or(defaults.prompt_top_symbol),
-        prompt_line_symbol: file_config
-            .prompt_line_symbol
+            .unwrap_or(defaults.prompt_open),
+        prompt_line: file_config
+            .prompt_line
             .clone()
-            .unwrap_or(defaults.prompt_line_symbol),
-        prompt_done_symbol: file_config
-            .prompt_done_symbol
+            .unwrap_or(defaults.prompt_line),
+        prompt_done: file_config
+            .prompt_done
             .clone()
-            .unwrap_or(defaults.prompt_done_symbol),
-        prompt_close_symbol: file_config
-            .prompt_close_symbol
+            .unwrap_or(defaults.prompt_done),
+        prompt_close: file_config
+            .prompt_close
             .clone()
-            .unwrap_or(defaults.prompt_close_symbol),
+            .unwrap_or(defaults.prompt_close),
         spinner_frames: file_config.spinner_frames.clone().unwrap_or(defaults.spinner_frames),
         spinner_interval_ms: file_config.spinner_interval_ms.unwrap_or(defaults.spinner_interval_ms),
         ..defaults
@@ -199,10 +199,10 @@ mod tests {
             api_url = "https://example.com/api"
             system_prompt = "custom prompt"
             prompt_marker = "> "
-            prompt_top_symbol = "◈"
-            prompt_line_symbol = "│"
-            prompt_done_symbol = "◇"
-            prompt_close_symbol = "*"
+            prompt_open = "◈"
+            prompt_line = "│"
+            prompt_done = "◇"
+            prompt_close = "*"
             spinner_frames = ["|", "/", "-", "\\"]
             spinner_interval_ms = 200
             "#,
@@ -213,10 +213,10 @@ mod tests {
         assert_eq!(file_config.api_url.as_deref(), Some("https://example.com/api"));
         assert_eq!(file_config.system_prompt.as_deref(), Some("custom prompt"));
         assert_eq!(file_config.prompt_marker.as_deref(), Some("> "));
-        assert_eq!(file_config.prompt_top_symbol.as_deref(), Some("◈"));
-        assert_eq!(file_config.prompt_line_symbol.as_deref(), Some("│"));
-        assert_eq!(file_config.prompt_done_symbol.as_deref(), Some("◇"));
-        assert_eq!(file_config.prompt_close_symbol.as_deref(), Some("*"));
+        assert_eq!(file_config.prompt_open.as_deref(), Some("◈"));
+        assert_eq!(file_config.prompt_line.as_deref(), Some("│"));
+        assert_eq!(file_config.prompt_done.as_deref(), Some("◇"));
+        assert_eq!(file_config.prompt_close.as_deref(), Some("*"));
         assert_eq!(
             file_config.spinner_frames,
             Some(vec!["|".to_string(), "/".to_string(), "-".to_string(), "\\".to_string()])
@@ -244,10 +244,10 @@ mod tests {
         assert_eq!(file_config.api_url, None);
         assert_eq!(file_config.system_prompt, None);
         assert_eq!(file_config.prompt_marker, None);
-        assert_eq!(file_config.prompt_top_symbol, None);
-        assert_eq!(file_config.prompt_line_symbol, None);
-        assert_eq!(file_config.prompt_done_symbol, None);
-        assert_eq!(file_config.prompt_close_symbol, None);
+        assert_eq!(file_config.prompt_open, None);
+        assert_eq!(file_config.prompt_line, None);
+        assert_eq!(file_config.prompt_done, None);
+        assert_eq!(file_config.prompt_close, None);
         assert_eq!(file_config.spinner_frames, None);
         assert_eq!(file_config.spinner_interval_ms, None);
     }
@@ -308,10 +308,10 @@ mod tests {
         assert_eq!(theme.code_snippet_text_color, "\x1b[94m");
         assert_eq!(theme.reset, "\x1b[0m");
         assert_eq!(theme.prompt_marker, DEFAULT_PROMPT_MARKER);
-        assert_eq!(theme.prompt_top_symbol, DEFAULT_PROMPT_TOP_SYMBOL);
-        assert_eq!(theme.prompt_line_symbol, DEFAULT_PROMPT_LINE_SYMBOL);
-        assert_eq!(theme.prompt_done_symbol, DEFAULT_PROMPT_DONE_SYMBOL);
-        assert_eq!(theme.prompt_close_symbol, DEFAULT_PROMPT_CLOSE_SYMBOL);
+        assert_eq!(theme.prompt_open, DEFAULT_PROMPT_OPEN);
+        assert_eq!(theme.prompt_line, DEFAULT_PROMPT_LINE);
+        assert_eq!(theme.prompt_done, DEFAULT_PROMPT_DONE);
+        assert_eq!(theme.prompt_close, DEFAULT_PROMPT_CLOSE);
         assert_eq!(
             theme.spinner_frames,
             DEFAULT_SPINNER_FRAMES.iter().map(|s| s.to_string()).collect::<Vec<_>>()
@@ -325,10 +325,10 @@ mod tests {
         let defaults = Theme::default();
 
         assert_eq!(theme.prompt_marker, defaults.prompt_marker);
-        assert_eq!(theme.prompt_top_symbol, defaults.prompt_top_symbol);
-        assert_eq!(theme.prompt_line_symbol, defaults.prompt_line_symbol);
-        assert_eq!(theme.prompt_done_symbol, defaults.prompt_done_symbol);
-        assert_eq!(theme.prompt_close_symbol, defaults.prompt_close_symbol);
+        assert_eq!(theme.prompt_open, defaults.prompt_open);
+        assert_eq!(theme.prompt_line, defaults.prompt_line);
+        assert_eq!(theme.prompt_done, defaults.prompt_done);
+        assert_eq!(theme.prompt_close, defaults.prompt_close);
         assert_eq!(theme.spinner_frames, defaults.spinner_frames);
         assert_eq!(theme.spinner_interval_ms, defaults.spinner_interval_ms);
     }
@@ -337,10 +337,10 @@ mod tests {
     fn build_theme_uses_file_overrides_when_present() {
         let file_config = FileConfig {
             prompt_marker: Some("> ".to_string()),
-            prompt_top_symbol: Some("◈".to_string()),
-            prompt_line_symbol: Some("│".to_string()),
-            prompt_done_symbol: Some("◇".to_string()),
-            prompt_close_symbol: Some("*".to_string()),
+            prompt_open: Some("◈".to_string()),
+            prompt_line: Some("│".to_string()),
+            prompt_done: Some("◇".to_string()),
+            prompt_close: Some("*".to_string()),
             spinner_frames: Some(vec!["|".to_string(), "/".to_string()]),
             spinner_interval_ms: Some(250),
             ..FileConfig::default()
@@ -349,10 +349,10 @@ mod tests {
         let theme = build_theme(&file_config);
 
         assert_eq!(theme.prompt_marker, "> ");
-        assert_eq!(theme.prompt_top_symbol, "◈");
-        assert_eq!(theme.prompt_line_symbol, "│");
-        assert_eq!(theme.prompt_done_symbol, "◇");
-        assert_eq!(theme.prompt_close_symbol, "*");
+        assert_eq!(theme.prompt_open, "◈");
+        assert_eq!(theme.prompt_line, "│");
+        assert_eq!(theme.prompt_done, "◇");
+        assert_eq!(theme.prompt_close, "*");
         assert_eq!(theme.spinner_frames, vec!["|".to_string(), "/".to_string()]);
         assert_eq!(theme.spinner_interval_ms, 250);
     }
@@ -368,7 +368,7 @@ mod tests {
         let defaults = Theme::default();
 
         assert_eq!(theme.prompt_marker, "> ");
-        assert_eq!(theme.prompt_top_symbol, defaults.prompt_top_symbol);
+        assert_eq!(theme.prompt_open, defaults.prompt_open);
         assert_eq!(theme.spinner_interval_ms, defaults.spinner_interval_ms);
     }
 }

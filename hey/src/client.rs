@@ -78,7 +78,7 @@ impl Drop for CursorGuard {
 
 /// Sends `messages` to the configured model, showing an animated spinner
 /// (`theme.spinner_frames`) in place while waiting, replacing it with
-/// `theme.prompt_done_symbol` once the response arrives, and returns the
+/// `theme.prompt_done` once the response arrives, and returns the
 /// trimmed answer text.
 pub fn fetch_answer_with_spinner(
     model: &Model,
@@ -121,7 +121,7 @@ pub fn fetch_answer_with_spinner(
     };
 
     // Replace the spinner with the done symbol once the answer/error is ready.
-    println!("\x1b[2K\r{}", theme.prompt_done_symbol);
+    println!("\x1b[2K\r{}", theme.prompt_done);
 
     result
 }
