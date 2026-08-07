@@ -4,7 +4,7 @@
 
 ---
 
-![Example usage of the hey application](./.github/example-usage.png)
+![Example usage of the hey application](./.github/example_usage.gif)
 
 ---
 
