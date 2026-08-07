@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for a `~/.config/hey.toml` configuration file to override the default model, API URL and system prompt.
 - `hey.toml` support for overriding the prompt/response UI symbols (`prompt_marker`, `prompt_open`, `prompt_line`, `prompt_done`, `prompt_close`) and the spinner animation (`spinner_frames`, `spinner_interval_ms`).
+- _Buddies_: named assistants configurable via `[[buddies]]` entries in `hey.toml`, each with their own `model` and `system_prompt`. Select one by name (case-insensitive) as the first argument, e.g. `hey John`. Without a name, the buddy marked `default = true` is used (or the first one configured, or a hardcoded default buddy if none are configured).
 
 ### Changed
 
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Support for the `OPENROUTER_MODEL` environment variable (breaking change). Use `~/.config/hey.toml` instead.
+- Support for configuring `model` and `system_prompt` as top-level `hey.toml` fields (breaking change). Use `[[buddies]]` entries instead.
 
 ## [0.3.0]
 

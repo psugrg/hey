@@ -104,10 +104,10 @@
 
 10. Implement _buddies_, assistants that can be selected and individually configured
 
-    - [ ] The initial step is to remove the possibility to configure the `model` and `system_prompt` by the `hey.toml` configuration file.
+    - [x] The initial step is to remove the possibility to configure the `model` and `system_prompt` by the `hey.toml` configuration file.
           This will be replaced by the _buddies_ configuration in the next steps.
 
-    - [ ] The `hey.toml` file should allow to configure the assistants called `baddies`.
+    - [x] The `hey.toml` file should allow to configure the assistants called `baddies`.
 
       _Buddies_ can be selected by providing their name as a command to the application, e.g. `hey John`. The command should be case insensitive.
       Example configuration:
@@ -132,6 +132,6 @@
 
       If the configuration file is missing, or if there is no `buddies` configured, the `hey` application should use the hardcoded default one, as it is right now.
 
-    - [ ] Document the configuration the ./README.md` file.
+    - [x] Document the configuration the ./README.md` file.
 
-    - [ ] Implement unit tests and integration tests
+    - [x] Implement unit tests and integration tests

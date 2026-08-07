@@ -84,12 +84,10 @@ You can get an API key from [openrouter.ai](https://openrouter.ai).
 
 ### Configuration file
 
-You can override the default model, API URL, system prompt and UI symbols by creating `~/.config/hey.toml`:
+You can override the default API URL and UI symbols by creating `~/.config/hey.toml`:
 
 ```toml
-model = "openai/gpt-4o-mini"
 api_url = "https://openrouter.ai/api/v1/chat/completions"
-system_prompt = "You are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). Keep answers concise and focused on CLI usage."
 prompt_marker = "› "
 prompt_open = "●"
 prompt_line = "╎"
@@ -112,6 +110,39 @@ All fields are optional; any field omitted from the file falls back to its defau
 > [!NOTE]
 > The API key is never read from `hey.toml`. It must always be set via the `OPENROUTER_API_KEY` environment variable.
 
+### Buddies
+
+_Buddies_ are named assistants, each with their own model and system prompt. Configure them in `~/.config/hey.toml` with one `[[buddies]]` entry per buddy:
+
+```toml
+[[buddies]]
+name = "Tom"
+default = true
+model = "openai/gpt-4o-mini"
+system_prompt = "your name is Tom and you are a helpful assistant that answers questions about command-line tools and commands (e.g. bash, ls, grep, cat, find, etc). keep answers concise and focused on cli usage."
+
+[[buddies]]
+name = "John"
+model = "google/gemini-2.5-flash"
+system_prompt = "your name is John and you are a helpful english teacher that can translate words and phrases and explain their meaning to the user who asked the question"
+```
+
+Select a buddy by passing its name (case-insensitive) as the first argument:
+
+```bash
+hey John
+```
+
+Running `hey` without a name uses the default buddy:
+
+- The buddy marked `default = true`. If more than one is marked `default`, the first one wins.
+- If none is marked `default`, the first buddy listed in `hey.toml`.
+- If `hey.toml` doesn't exist, or has no `[[buddies]]` configured, a hardcoded default buddy is used (the same model and system prompt as before buddies existed).
+
+Each `[[buddies]]` entry's `model` and `system_prompt` are optional and fall back to those same hardcoded defaults when omitted.
+
+If you ask for a buddy name that isn't configured, `hey` exits with an error listing the available buddy names.
+
 ## Usage
 
 Run `hey` and type your question at the prompt:
@@ -120,11 +151,19 @@ Run `hey` and type your question at the prompt:
 hey
 ```
 
+To ask a specific buddy, pass its name (case-insensitive) as the first argument:
+
+```bash
+hey John
+```
+
 To ask a follow-up question that continues the previous answer, use the `-f` (or `--follow-up`) flag:
 
 ```bash
 hey -f
 ```
+
+
 
 > [!NOTE]
 > Conversation history is kept separately per terminal, so using `-f` only continues the last conversation held in _that_ terminal — it won't pick up context from other terminals. Only the most recent conversation is remembered (no long-term history).

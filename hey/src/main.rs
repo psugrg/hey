@@ -3,8 +3,8 @@ use hey::config::Config;
 use hey::{cli, history, prompt, render};
 use std::process::ExitCode;
 
-fn run(follow_up: bool) -> Result<(), String> {
-    let config = Config::load()?;
+fn run(buddy: Option<&str>, follow_up: bool) -> Result<(), String> {
+    let config = Config::load(buddy)?;
 
     let question = prompt::get_question(&config.theme)?;
 
@@ -32,19 +32,25 @@ fn run(follow_up: bool) -> Result<(), String> {
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
 
-    if args.iter().any(|arg| arg == "--help" || arg == "-h") {
+    let parsed = match cli::parse(&args) {
+        Ok(parsed) => parsed,
+        Err(err) => {
+            eprintln!("Error: {err}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    if parsed.help {
         cli::print_help();
         return ExitCode::SUCCESS;
     }
 
-    if args.iter().any(|arg| arg == "--version" || arg == "-V") {
+    if parsed.version {
         println!("hey version {}", env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
 
-    let follow_up = args.iter().any(|arg| arg == "--follow-up" || arg == "-f");
-
-    match run(follow_up) {
+    match run(parsed.buddy.as_deref(), parsed.follow_up) {
         Ok(()) => ExitCode::SUCCESS,
         Err(err) => {
             eprintln!("Error: {err}");

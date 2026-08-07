@@ -35,7 +35,7 @@ fn write_hey_toml(home: &Path, contents: &str) {
 fn loads_defaults_when_hey_toml_is_missing() {
     let home = tempfile::tempdir().unwrap();
 
-    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+    let config = with_env(home.path(), Some("test-key"), || Config::load(None)).unwrap();
 
     assert_eq!(config.model.api_key, "test-key");
     assert_eq!(config.model.name, DEFAULT_MODEL);
@@ -55,13 +55,15 @@ fn overrides_defaults_from_hey_toml() {
     write_hey_toml(
         home.path(),
         r#"
-        model = "openai/gpt-4o"
         api_url = "https://example.com/api"
+
+        [[buddies]]
+        model = "openai/gpt-4o"
         system_prompt = "custom prompt"
         "#,
     );
 
-    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+    let config = with_env(home.path(), Some("test-key"), || Config::load(None)).unwrap();
 
     assert_eq!(config.model.name, "openai/gpt-4o");
     assert_eq!(config.model.api_url, "https://example.com/api");
@@ -84,7 +86,7 @@ fn overrides_ui_symbols_from_hey_toml() {
         "#,
     );
 
-    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+    let config = with_env(home.path(), Some("test-key"), || Config::load(None)).unwrap();
 
     assert_eq!(config.theme.prompt_marker, "> ");
     assert_eq!(config.theme.prompt_open, "◈");
@@ -101,9 +103,15 @@ fn overrides_ui_symbols_from_hey_toml() {
 #[test]
 fn partial_overrides_fall_back_to_defaults() {
     let home = tempfile::tempdir().unwrap();
-    write_hey_toml(home.path(), r#"model = "openai/gpt-4o""#);
+    write_hey_toml(
+        home.path(),
+        r#"
+        [[buddies]]
+        model = "openai/gpt-4o"
+        "#,
+    );
 
-    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+    let config = with_env(home.path(), Some("test-key"), || Config::load(None)).unwrap();
 
     assert_eq!(config.model.name, "openai/gpt-4o");
     assert_eq!(config.model.api_url, DEFAULT_API_URL);
@@ -116,7 +124,7 @@ fn partial_ui_symbol_overrides_fall_back_to_defaults() {
     let home = tempfile::tempdir().unwrap();
     write_hey_toml(home.path(), r#"prompt_marker = "> ""#);
 
-    let config = with_env(home.path(), Some("test-key"), Config::load).unwrap();
+    let config = with_env(home.path(), Some("test-key"), || Config::load(None)).unwrap();
 
     assert_eq!(config.theme.prompt_marker, "> ");
     assert_eq!(config.theme.prompt_open, DEFAULT_PROMPT_OPEN);
@@ -131,7 +139,7 @@ fn ignores_api_key_if_present_in_toml() {
     let home = tempfile::tempdir().unwrap();
     write_hey_toml(home.path(), r#"api_key = "should-be-ignored""#);
 
-    let config = with_env(home.path(), Some("real-key"), Config::load).unwrap();
+    let config = with_env(home.path(), Some("real-key"), || Config::load(None)).unwrap();
 
     assert_eq!(config.model.api_key, "real-key");
 }
@@ -140,7 +148,7 @@ fn ignores_api_key_if_present_in_toml() {
 fn fails_when_api_key_missing() {
     let home = tempfile::tempdir().unwrap();
 
-    let result = with_env(home.path(), None, Config::load);
+    let result = with_env(home.path(), None, || Config::load(None));
 
     assert!(result.is_err());
 }
@@ -148,9 +156,73 @@ fn fails_when_api_key_missing() {
 #[test]
 fn fails_on_invalid_toml() {
     let home = tempfile::tempdir().unwrap();
-    write_hey_toml(home.path(), "model = ");
+    write_hey_toml(home.path(), "api_url = ");
 
-    let result = with_env(home.path(), Some("test-key"), Config::load);
+    let result = with_env(home.path(), Some("test-key"), || Config::load(None));
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn selects_buddy_by_name_case_insensitively() {
+    let home = tempfile::tempdir().unwrap();
+    write_hey_toml(
+        home.path(),
+        r#"
+        [[buddies]]
+        name = "Tom"
+        default = true
+        model = "openai/gpt-4o-mini"
+        system_prompt = "Tom's prompt"
+
+        [[buddies]]
+        name = "John"
+        model = "google/gemini-2.5-flash"
+        system_prompt = "John's prompt"
+        "#,
+    );
+
+    let config = with_env(home.path(), Some("test-key"), || Config::load(Some("john"))).unwrap();
+
+    assert_eq!(config.model.name, "google/gemini-2.5-flash");
+    assert_eq!(config.model.system_prompt, "John's prompt");
+}
+
+#[test]
+fn selects_default_buddy_when_none_requested() {
+    let home = tempfile::tempdir().unwrap();
+    write_hey_toml(
+        home.path(),
+        r#"
+        [[buddies]]
+        name = "Tom"
+        model = "openai/gpt-4o-mini"
+
+        [[buddies]]
+        name = "John"
+        default = true
+        model = "google/gemini-2.5-flash"
+        "#,
+    );
+
+    let config = with_env(home.path(), Some("test-key"), || Config::load(None)).unwrap();
+
+    assert_eq!(config.model.name, "google/gemini-2.5-flash");
+}
+
+#[test]
+fn fails_when_requested_buddy_not_found() {
+    let home = tempfile::tempdir().unwrap();
+    write_hey_toml(
+        home.path(),
+        r#"
+        [[buddies]]
+        name = "Tom"
+        model = "openai/gpt-4o-mini"
+        "#,
+    );
+
+    let result = with_env(home.path(), Some("test-key"), || Config::load(Some("Unknown")));
 
     assert!(result.is_err());
 }

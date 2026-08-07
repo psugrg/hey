@@ -1,9 +1,10 @@
-//! Application configuration: AI model settings and UI theme.
+//! Application configuration: buddies (AI assistants) and UI theme.
 //!
 //! The API key always comes from the `OPENROUTER_API_KEY` environment
-//! variable. The model, API URL, system prompt and UI symbols can be
-//! overridden via `~/.config/hey.toml`; if that file is absent, or a value
-//! is omitted, the hardcoded defaults below are used.
+//! variable. The API URL, UI symbols and buddies (each with their own model
+//! and system prompt) can be overridden via `~/.config/hey.toml`; if that
+//! file is absent, or a value is omitted, the hardcoded defaults below are
+//! used.
 
 use serde::Deserialize;
 
@@ -85,9 +86,7 @@ pub struct Config {
 /// fall back to the hardcoded defaults.
 #[derive(Deserialize, Default, Debug, PartialEq)]
 struct FileConfig {
-    model: Option<String>,
     api_url: Option<String>,
-    system_prompt: Option<String>,
     prompt_marker: Option<String>,
     prompt_open: Option<String>,
     prompt_line: Option<String>,
@@ -95,6 +94,28 @@ struct FileConfig {
     prompt_close: Option<String>,
     spinner_frames: Option<Vec<String>>,
     spinner_interval_ms: Option<u64>,
+    buddies: Option<Vec<BuddyFileConfig>>,
+}
+
+/// Shape of a single `[[buddies]]` entry in `hey.toml`. All fields are
+/// optional; missing `model`/`system_prompt` fall back to the hardcoded
+/// defaults.
+#[derive(Deserialize, Default, Debug, PartialEq)]
+struct BuddyFileConfig {
+    name: Option<String>,
+    default: Option<bool>,
+    model: Option<String>,
+    system_prompt: Option<String>,
+}
+
+/// A fully resolved assistant: either loaded from a `[[buddies]]` entry, or
+/// the hardcoded default used when `hey.toml` doesn't configure any.
+#[derive(Debug)]
+struct Buddy {
+    name: Option<String>,
+    is_default: bool,
+    model: String,
+    system_prompt: String,
 }
 
 impl FileConfig {
@@ -122,18 +143,68 @@ impl FileConfig {
     }
 }
 
-/// Builds the [`Model`] settings from the required API key and the optional
-/// file overrides, falling back to the hardcoded defaults for any field the
-/// file doesn't set.
-fn build_model(api_key: String, file_config: &FileConfig) -> Model {
+/// Builds the list of configured buddies from `hey.toml`, falling back to a
+/// single hardcoded default buddy when none are configured.
+fn build_buddies(file_config: &FileConfig) -> Vec<Buddy> {
+    match &file_config.buddies {
+        None => vec![Buddy {
+            name: None,
+            is_default: true,
+            model: DEFAULT_MODEL.to_string(),
+            system_prompt: DEFAULT_SYSTEM_PROMPT.to_string(),
+        }],
+        Some(buddies) if buddies.is_empty() => vec![Buddy {
+            name: None,
+            is_default: true,
+            model: DEFAULT_MODEL.to_string(),
+            system_prompt: DEFAULT_SYSTEM_PROMPT.to_string(),
+        }],
+        Some(buddies) => buddies
+            .iter()
+            .map(|buddy| Buddy {
+                name: buddy.name.clone(),
+                is_default: buddy.default.unwrap_or(false),
+                model: buddy.model.clone().unwrap_or_else(|| DEFAULT_MODEL.to_string()),
+                system_prompt: buddy
+                    .system_prompt
+                    .clone()
+                    .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string()),
+            })
+            .collect(),
+    }
+}
+
+/// Selects a buddy from `buddies` by name (case-insensitive), or the default
+/// buddy when `requested` is `None`: the first one marked `default = true`,
+/// or, if none is marked, the first buddy in the list.
+fn select_buddy<'a>(buddies: &'a [Buddy], requested: Option<&str>) -> Result<&'a Buddy, String> {
+    match requested {
+        Some(name) => buddies
+            .iter()
+            .find(|buddy| buddy.name.as_deref().is_some_and(|n| n.eq_ignore_ascii_case(name)))
+            .ok_or_else(|| {
+                let available: Vec<&str> = buddies.iter().filter_map(|b| b.name.as_deref()).collect();
+                if available.is_empty() {
+                    format!("No buddy named '{name}' found in hey.toml. No buddies are configured.")
+                } else {
+                    format!("No buddy named '{name}' found in hey.toml. Available: {}", available.join(", "))
+                }
+            }),
+        None => Ok(buddies
+            .iter()
+            .find(|buddy| buddy.is_default)
+            .unwrap_or(&buddies[0])),
+    }
+}
+
+/// Builds the [`Model`] settings from the required API key, the resolved
+/// buddy, and the optional `api_url` file override.
+fn build_model(api_key: String, buddy: &Buddy, file_config: &FileConfig) -> Model {
     Model {
         api_key,
-        name: file_config.model.clone().unwrap_or_else(|| DEFAULT_MODEL.to_string()),
+        name: buddy.model.clone(),
         api_url: file_config.api_url.clone().unwrap_or_else(|| DEFAULT_API_URL.to_string()),
-        system_prompt: file_config
-            .system_prompt
-            .clone()
-            .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string()),
+        system_prompt: buddy.system_prompt.clone(),
     }
 }
 
@@ -168,9 +239,14 @@ fn build_theme(file_config: &FileConfig) -> Theme {
 
 impl Config {
     /// Loads configuration from `OPENROUTER_API_KEY` (required) and
-    /// `~/.config/hey.toml` (optional overrides for model, API URL, system
-    /// prompt and UI symbols).
-    pub fn load() -> Result<Self, String> {
+    /// `~/.config/hey.toml` (optional overrides for API URL, UI symbols and
+    /// buddies).
+    ///
+    /// `buddy` selects a buddy by name (case-insensitive). When `None`, the
+    /// default buddy is used: the first one marked `default = true`, or the
+    /// first buddy in the list if none is marked, or the hardcoded default
+    /// buddy if no `[[buddies]]` are configured.
+    pub fn load(buddy: Option<&str>) -> Result<Self, String> {
         let api_key = std::env::var("OPENROUTER_API_KEY").map_err(|_| {
             "OPENROUTER_API_KEY environment variable is not set.\n\
              Set it with: export OPENROUTER_API_KEY=\"your-api-key-here\""
@@ -178,9 +254,11 @@ impl Config {
         })?;
 
         let file_config = FileConfig::load()?;
+        let buddies = build_buddies(&file_config);
+        let selected_buddy = select_buddy(&buddies, buddy)?;
 
         Ok(Config {
-            model: build_model(api_key, &file_config),
+            model: build_model(api_key, selected_buddy, &file_config),
             theme: build_theme(&file_config),
             prompt_width: DEFAULT_PROMPT_WIDTH,
         })
@@ -195,9 +273,7 @@ mod tests {
     fn parses_full_toml() {
         let file_config = FileConfig::parse(
             r#"
-            model = "openai/gpt-4o"
             api_url = "https://example.com/api"
-            system_prompt = "custom prompt"
             prompt_marker = "> "
             prompt_open = "◈"
             prompt_line = "│"
@@ -205,13 +281,22 @@ mod tests {
             prompt_close = "*"
             spinner_frames = ["|", "/", "-", "\\"]
             spinner_interval_ms = 200
+
+            [[buddies]]
+            name = "Tom"
+            default = true
+            model = "openai/gpt-4o-mini"
+            system_prompt = "Tom's prompt"
+
+            [[buddies]]
+            name = "John"
+            model = "google/gemini-2.5-flash"
+            system_prompt = "John's prompt"
             "#,
         )
         .unwrap();
 
-        assert_eq!(file_config.model.as_deref(), Some("openai/gpt-4o"));
         assert_eq!(file_config.api_url.as_deref(), Some("https://example.com/api"));
-        assert_eq!(file_config.system_prompt.as_deref(), Some("custom prompt"));
         assert_eq!(file_config.prompt_marker.as_deref(), Some("> "));
         assert_eq!(file_config.prompt_open.as_deref(), Some("◈"));
         assert_eq!(file_config.prompt_line.as_deref(), Some("│"));
@@ -222,27 +307,33 @@ mod tests {
             Some(vec!["|".to_string(), "/".to_string(), "-".to_string(), "\\".to_string()])
         );
         assert_eq!(file_config.spinner_interval_ms, Some(200));
+
+        let buddies = file_config.buddies.unwrap();
+        assert_eq!(buddies.len(), 2);
+        assert_eq!(buddies[0].name.as_deref(), Some("Tom"));
+        assert_eq!(buddies[0].default, Some(true));
+        assert_eq!(buddies[0].model.as_deref(), Some("openai/gpt-4o-mini"));
+        assert_eq!(buddies[0].system_prompt.as_deref(), Some("Tom's prompt"));
+        assert_eq!(buddies[1].name.as_deref(), Some("John"));
+        assert_eq!(buddies[1].default, None);
     }
 
     #[test]
     fn parses_partial_toml() {
-        let file_config = FileConfig::parse(r#"model = "openai/gpt-4o""#).unwrap();
+        let file_config = FileConfig::parse(r#"api_url = "https://example.com/api""#).unwrap();
 
-        assert_eq!(file_config.model.as_deref(), Some("openai/gpt-4o"));
-        assert_eq!(file_config.api_url, None);
-        assert_eq!(file_config.system_prompt, None);
+        assert_eq!(file_config.api_url.as_deref(), Some("https://example.com/api"));
         assert_eq!(file_config.prompt_marker, None);
         assert_eq!(file_config.spinner_frames, None);
         assert_eq!(file_config.spinner_interval_ms, None);
+        assert_eq!(file_config.buddies, None);
     }
 
     #[test]
     fn parses_empty_toml_as_defaults() {
         let file_config = FileConfig::parse("").unwrap();
 
-        assert_eq!(file_config.model, None);
         assert_eq!(file_config.api_url, None);
-        assert_eq!(file_config.system_prompt, None);
         assert_eq!(file_config.prompt_marker, None);
         assert_eq!(file_config.prompt_open, None);
         assert_eq!(file_config.prompt_line, None);
@@ -250,54 +341,203 @@ mod tests {
         assert_eq!(file_config.prompt_close, None);
         assert_eq!(file_config.spinner_frames, None);
         assert_eq!(file_config.spinner_interval_ms, None);
+        assert_eq!(file_config.buddies, None);
     }
 
     #[test]
     fn rejects_invalid_toml() {
-        let result = FileConfig::parse("model = ");
+        let result = FileConfig::parse("api_url = ");
 
         assert!(result.is_err());
     }
 
     #[test]
-    fn build_model_falls_back_to_defaults_when_file_config_is_empty() {
-        let model = build_model("key".to_string(), &FileConfig::default());
+    fn build_buddies_returns_hardcoded_default_when_none_configured() {
+        let buddies = build_buddies(&FileConfig::default());
 
-        assert_eq!(model.api_key, "key");
-        assert_eq!(model.name, DEFAULT_MODEL);
-        assert_eq!(model.api_url, DEFAULT_API_URL);
-        assert_eq!(model.system_prompt, DEFAULT_SYSTEM_PROMPT);
+        assert_eq!(buddies.len(), 1);
+        assert_eq!(buddies[0].name, None);
+        assert!(buddies[0].is_default);
+        assert_eq!(buddies[0].model, DEFAULT_MODEL);
+        assert_eq!(buddies[0].system_prompt, DEFAULT_SYSTEM_PROMPT);
     }
 
     #[test]
-    fn build_model_uses_file_overrides_when_present() {
+    fn build_buddies_returns_hardcoded_default_when_list_is_empty() {
         let file_config = FileConfig {
-            model: Some("custom/model".to_string()),
-            api_url: Some("https://custom.example/api".to_string()),
-            system_prompt: Some("custom prompt".to_string()),
+            buddies: Some(vec![]),
             ..FileConfig::default()
         };
 
-        let model = build_model("key".to_string(), &file_config);
+        let buddies = build_buddies(&file_config);
+
+        assert_eq!(buddies.len(), 1);
+        assert_eq!(buddies[0].name, None);
+        assert!(buddies[0].is_default);
+    }
+
+    #[test]
+    fn build_buddies_falls_back_to_defaults_for_missing_fields() {
+        let file_config = FileConfig {
+            buddies: Some(vec![BuddyFileConfig {
+                name: Some("Tom".to_string()),
+                ..BuddyFileConfig::default()
+            }]),
+            ..FileConfig::default()
+        };
+
+        let buddies = build_buddies(&file_config);
+
+        assert_eq!(buddies[0].name.as_deref(), Some("Tom"));
+        assert!(!buddies[0].is_default);
+        assert_eq!(buddies[0].model, DEFAULT_MODEL);
+        assert_eq!(buddies[0].system_prompt, DEFAULT_SYSTEM_PROMPT);
+    }
+
+    #[test]
+    fn select_buddy_picks_the_one_marked_default() {
+        let file_config = FileConfig {
+            buddies: Some(vec![
+                BuddyFileConfig {
+                    name: Some("Tom".to_string()),
+                    ..BuddyFileConfig::default()
+                },
+                BuddyFileConfig {
+                    name: Some("John".to_string()),
+                    default: Some(true),
+                    ..BuddyFileConfig::default()
+                },
+            ]),
+            ..FileConfig::default()
+        };
+        let buddies = build_buddies(&file_config);
+
+        let selected = select_buddy(&buddies, None).unwrap();
+
+        assert_eq!(selected.name.as_deref(), Some("John"));
+    }
+
+    #[test]
+    fn select_buddy_picks_first_marked_default_when_multiple() {
+        let file_config = FileConfig {
+            buddies: Some(vec![
+                BuddyFileConfig {
+                    name: Some("Tom".to_string()),
+                    default: Some(true),
+                    ..BuddyFileConfig::default()
+                },
+                BuddyFileConfig {
+                    name: Some("John".to_string()),
+                    default: Some(true),
+                    ..BuddyFileConfig::default()
+                },
+            ]),
+            ..FileConfig::default()
+        };
+        let buddies = build_buddies(&file_config);
+
+        let selected = select_buddy(&buddies, None).unwrap();
+
+        assert_eq!(selected.name.as_deref(), Some("Tom"));
+    }
+
+    #[test]
+    fn select_buddy_falls_back_to_first_when_none_marked_default() {
+        let file_config = FileConfig {
+            buddies: Some(vec![
+                BuddyFileConfig {
+                    name: Some("Tom".to_string()),
+                    ..BuddyFileConfig::default()
+                },
+                BuddyFileConfig {
+                    name: Some("John".to_string()),
+                    ..BuddyFileConfig::default()
+                },
+            ]),
+            ..FileConfig::default()
+        };
+        let buddies = build_buddies(&file_config);
+
+        let selected = select_buddy(&buddies, None).unwrap();
+
+        assert_eq!(selected.name.as_deref(), Some("Tom"));
+    }
+
+    #[test]
+    fn select_buddy_matches_by_name_case_insensitively() {
+        let file_config = FileConfig {
+            buddies: Some(vec![BuddyFileConfig {
+                name: Some("John".to_string()),
+                ..BuddyFileConfig::default()
+            }]),
+            ..FileConfig::default()
+        };
+        let buddies = build_buddies(&file_config);
+
+        let selected = select_buddy(&buddies, Some("john")).unwrap();
+
+        assert_eq!(selected.name.as_deref(), Some("John"));
+    }
+
+    #[test]
+    fn select_buddy_errors_when_name_not_found() {
+        let file_config = FileConfig {
+            buddies: Some(vec![BuddyFileConfig {
+                name: Some("John".to_string()),
+                ..BuddyFileConfig::default()
+            }]),
+            ..FileConfig::default()
+        };
+        let buddies = build_buddies(&file_config);
+
+        let result = select_buddy(&buddies, Some("Foo"));
+
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("John"));
+    }
+
+    #[test]
+    fn select_buddy_errors_when_name_requested_but_none_configured() {
+        let buddies = build_buddies(&FileConfig::default());
+
+        let result = select_buddy(&buddies, Some("Foo"));
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn build_model_uses_buddy_and_falls_back_to_default_api_url() {
+        let buddy = Buddy {
+            name: Some("Tom".to_string()),
+            is_default: true,
+            model: "custom/model".to_string(),
+            system_prompt: "custom prompt".to_string(),
+        };
+
+        let model = build_model("key".to_string(), &buddy, &FileConfig::default());
 
         assert_eq!(model.api_key, "key");
         assert_eq!(model.name, "custom/model");
-        assert_eq!(model.api_url, "https://custom.example/api");
+        assert_eq!(model.api_url, DEFAULT_API_URL);
         assert_eq!(model.system_prompt, "custom prompt");
     }
 
     #[test]
-    fn build_model_mixes_overrides_and_defaults() {
+    fn build_model_uses_file_api_url_override() {
+        let buddy = Buddy {
+            name: None,
+            is_default: true,
+            model: DEFAULT_MODEL.to_string(),
+            system_prompt: DEFAULT_SYSTEM_PROMPT.to_string(),
+        };
         let file_config = FileConfig {
-            model: Some("custom/model".to_string()),
+            api_url: Some("https://custom.example/api".to_string()),
             ..FileConfig::default()
         };
 
-        let model = build_model("key".to_string(), &file_config);
+        let model = build_model("key".to_string(), &buddy, &file_config);
 
-        assert_eq!(model.name, "custom/model");
-        assert_eq!(model.api_url, DEFAULT_API_URL);
-        assert_eq!(model.system_prompt, DEFAULT_SYSTEM_PROMPT);
+        assert_eq!(model.api_url, "https://custom.example/api");
     }
 
     #[test]
